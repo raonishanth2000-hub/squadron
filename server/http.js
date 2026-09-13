@@ -7,7 +7,11 @@ const TYPES = {
   '.html': 'text/html; charset=utf-8', '.js': 'text/javascript; charset=utf-8',
   '.css': 'text/css; charset=utf-8',  '.json': 'application/json; charset=utf-8',
   '.svg': 'image/svg+xml', '.png': 'image/png', '.ico': 'image/x-icon',
-  '.woff2': 'font/woff2', '.map': 'application/json'
+  '.woff2': 'font/woff2', '.map': 'application/json',
+  /* crawlers fetch these two, and octet-stream makes some of them skip the file */
+  '.txt': 'text/plain; charset=utf-8', '.xml': 'application/xml; charset=utf-8',
+  '.webp': 'image/webp', '.jpg': 'image/jpeg', '.jpeg': 'image/jpeg',
+  '.gif': 'image/gif', '.mp4': 'video/mp4', '.webmanifest': 'application/manifest+json'
 };
 
 export class Router {

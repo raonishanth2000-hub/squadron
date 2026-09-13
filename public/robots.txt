@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+
+# The workspace itself needs a session, so there is nothing behind these for a
+# crawler to read — and /api/ should never be indexed.
+Disallow: /api/
+Disallow: /?meeting=
+Disallow: /?invite=
+
+Sitemap: https://squadron.nishanthrao.com/sitemap.xml
