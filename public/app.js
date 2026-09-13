@@ -2558,7 +2558,15 @@ function upsertSnippet(sn, quiet) {
     C.cur = sn;
     /* a live edit from a teammate must not yank the caret out from under you */
     if (!quiet && document.activeElement !== $('#code-area')) renderSnippets();
-    else if (quiet) { $('#code-del').hidden = !canDelete(sn); }
+    else if (quiet) {
+      $('#code-del').hidden = !canDelete(sn);
+      /* Redrawing the whole list here would move the caret, but the tab still has
+         to keep up: switching a file to Python left its chip reading C++ for the
+         rest of the session — a confusing thing to stare at while a Python
+         traceback prints underneath it. */
+      const chip = $(`[data-snip="${sn.id}"] .code-file-l`);
+      if (chip) chip.textContent = sn.lang === 'cpp' ? 'C++' : 'Py';
+    }
   } else if (C.open) renderSnippets();
 }
 
@@ -2594,6 +2602,20 @@ async function runSnippet() {
     const parts = [];
     if (r.stdout) parts.push(r.stdout.replace(/\n$/, ''));
     if (r.stderr) parts.push(r.stderr.replace(/\n$/, ''));
+
+    /* A program that reads input and was given none dies on EOF, and the
+       traceback explains that in a way only Python programmers recognise.
+       The input box is a collapsed <details> a few pixels away, so name
+       what is missing and open it — the fix is right there. */
+    const wantedInput = /EOFError|EOF when reading/i.test(r.stderr || '');
+    if (!r.ok && wantedInput && !$('#code-in').value.trim()) {
+      parts.push('', '— This program is waiting for input, and none was given.',
+        '  Put it in the Input (stdin) box just above, then press Run again.');
+      const box = $('.code-stdin');
+      if (box) { box.open = true; box.classList.add('want-input');
+        setTimeout(() => box.classList.remove('want-input'), 2800); }
+    }
+
     $('#code-out').textContent = parts.join('\n') || '(no output)';
     $('#code-out').dataset.state = r.ok ? 'ok' : 'bad';
     /* "exit ?" was what a crash or a runaway loop used to report — a null exit

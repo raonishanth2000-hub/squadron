@@ -2332,6 +2332,13 @@ body.has-cur #draw-canvas{cursor:none;}
   font-family:var(--f-mono);font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
   background:var(--azure-wash);color:var(--azure);vertical-align:middle;}
 
+/* the input box, when a run just died for want of it */
+.code-stdin.want-input > summary{color:var(--gold);}
+.code-stdin.want-input{outline:2px solid var(--gold-dim);outline-offset:3px;border-radius:var(--r-sm);
+  animation:wantInput 1.3s ease 2;}
+@keyframes wantInput{50%{outline-color:var(--gold);}}
+@media (prefers-reduced-motion:reduce){ .code-stdin.want-input{animation:none;} }
+
 /* ---------- private tasks ---------- */
 /* A dashed edge says "not on the shared board" at a glance, without the card
    having to shout about it. */
