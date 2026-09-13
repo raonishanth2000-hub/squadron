@@ -11,6 +11,8 @@ to the team rather than to you.
 
 [squadron.nishanthrao.com](https://squadron.nishanthrao.com)
 
+![The workspace](docs/chat.png)
+
 </div>
 
 ---
@@ -37,6 +39,27 @@ Squadron puts the work in the same place as the conversation.
 | **Meetings** | WebRTC video and screen share, joinable by link without joining the squad |
 | **XP and standings** | earned only from work the squad can actually see |
 | **Calendar** | with a reminder ten minutes before anything starts |
+
+### Code runs where the conversation is
+
+C++ and Python execute in a real sandbox — no network, a read-only toolchain, one
+writable directory — with stdin and saved test cases. Team files are shared with the
+squad; personal ones are yours.
+
+![The compiler](docs/compiler.png)
+
+### A board that pays for finished work
+
+Flat 5 XP a task, awarded only when it lands in Solved, and only for work the squad
+can actually see. Private tasks stay off everyone else's board and pay nothing.
+
+![The task board](docs/tasks.png)
+
+### A whiteboard for the thing you cannot explain in text
+
+Shapes, arrows, text and pages — shared with the squad, or private to you.
+
+![The whiteboard](docs/whiteboard.png)
 
 ## How it's built
 

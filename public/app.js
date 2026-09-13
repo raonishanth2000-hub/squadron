@@ -980,17 +980,17 @@ function wireAttach(which, btnSel, inputSel, boxSel, dropSel) {
   let depth = 0;
   drop.addEventListener('dragenter', (e) => {
     if (![...(e.dataTransfer?.types || [])].includes('Files')) return;
-    e.preventDefault(); depth++; drop.dataset.drop = '1';
+    e.preventDefault(); depth++; drop.dataset.filedrop = '1';
   });
   drop.addEventListener('dragover', (e) => {
     if (![...(e.dataTransfer?.types || [])].includes('Files')) return;
     e.preventDefault(); e.dataTransfer.dropEffect = 'copy';
   });
   /* counted, because dragging over a child fires leave on the parent */
-  drop.addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; delete drop.dataset.drop; } });
+  drop.addEventListener('dragleave', () => { if (--depth <= 0) { depth = 0; delete drop.dataset.filedrop; } });
   drop.addEventListener('drop', (e) => {
     if (!e.dataTransfer?.files?.length) return;
-    e.preventDefault(); depth = 0; delete drop.dataset.drop;
+    e.preventDefault(); depth = 0; delete drop.dataset.filedrop;
     stageFiles(which, e.dataTransfer.files);
   });
 }

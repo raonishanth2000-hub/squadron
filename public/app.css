@@ -2263,9 +2263,13 @@ body.has-cur #draw-canvas{cursor:none;}
 .att-bar{position:absolute;left:0;bottom:0;height:2px;width:100%;background:var(--gold);
   transform-origin:left;transition:transform .12s linear;}
 
-/* where a dragged file may be dropped */
-[data-drop]{position:relative;}
-[data-drop]::after{content:"Drop to attach";position:absolute;inset:0;z-index:var(--z-sticky);
+/* Where a dragged file may be dropped.
+
+   Named data-filedrop, not data-drop: the task board has used data-drop on its
+   columns since long before attachments existed, so a generic [data-drop] rule
+   painted "Drop to attach" across every column of the board permanently. */
+[data-filedrop]{position:relative;}
+[data-filedrop]::after{content:"Drop to attach";position:absolute;inset:0;z-index:var(--z-sticky);
   display:grid;place-items:center;pointer-events:none;
   background:rgba(9,10,16,.78);border:2px dashed var(--gold);border-radius:var(--r-md);
   font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;color:var(--gold);}
