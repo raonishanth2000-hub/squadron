@@ -10,6 +10,7 @@ import { q } from './db.js';
 import { userFromToken, migrateSessionTokens } from './auth.js';
 import { buildRouter, json, readBody, parseCookies, serveStatic, meetingPassOk } from './api-bridge.js';
 import { saveUpload, serveFile, fileRow, fileReachable } from './files.js';
+import { startInteractive } from './run.js';
 
 const root = dirname(dirname(fileURLToPath(import.meta.url)));
 const PUBLIC = join(root, 'public');
@@ -287,10 +288,40 @@ wss.on('connection', (ws, req) => {
       return;
     }
 
+    /* --- interactive run: output streams out, typed lines go back in --- */
+    if (msg.type === 'code-run') {
+      if (ws.run) { try { ws.run.kill(); } catch {} ws.run = null; }
+      if (!q.get('SELECT 1 FROM squad_members WHERE user_id = ?', user.id)) {
+        ws.send(JSON.stringify({ type: 'code-end', stage: 'blocked', stderr: 'Join a squad before running code.' }));
+        return;
+      }
+      const send = (o) => { if (ws.readyState === 1) { try { ws.send(JSON.stringify(o)); } catch {} } };
+      const token = Symbol('run');
+      ws.runToken = token;
+      startInteractive({
+        lang: msg.lang, source: msg.source, includes: [],
+        onOut: (o) => { if (ws.runToken === token) send({ type: 'code-out', ...o }); },
+        onEnd: (e) => { if (ws.runToken === token) { send({ type: 'code-end', ...e }); ws.run = null; } }
+      }).then(h => {
+        /* a second run may have started while this one was compiling */
+        if (ws.runToken !== token) { h?.kill(); return; }
+        ws.run = h;
+        if (h) send({ type: 'code-started' });
+      }).catch(() => send({ type: 'code-end', stage: 'error', stderr: 'Could not start.' }));
+      return;
+    }
+    if (msg.type === 'code-stdin') { ws.run?.write(msg.line ?? ''); return; }
+    if (msg.type === 'code-eof')   { ws.run?.eof(); return; }
+    if (msg.type === 'code-kill')  { ws.runToken = null; ws.run?.kill(); ws.run = null; return; }
+
     if (msg.type === 'meeting-leave') leaveMeeting(ws);
   });
 
   ws.on('close', () => {
+    /* the tab is gone; nothing should still be running on its behalf */
+    ws.runToken = null;
+    try { ws.run?.kill(); } catch {}
+    ws.run = null;
     leaveMeeting(ws);
     for (const id of ws.squads) squadRooms.get(id)?.delete(ws);
     /* drop the user entry too, or the map grows for the life of the process */

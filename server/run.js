@@ -334,6 +334,99 @@ export async function runCode({ lang, source, stdin, includes }) {
   }
 }
 
+/* ---------- interactive runs ----------
+   The batch path above feeds stdin in whole and waits for the program to end.
+   That is right for a judge, and wrong for learning: a program that asks a
+   question should let you answer it. This variant keeps the process alive,
+   pushes output as it appears, and takes typed lines back.
+
+   The wall clock is generous because a program waiting at a prompt is not
+   misbehaving. What still bounds it is `ulimit -t` — a program that is actually
+   computing burns CPU and gets stopped at the same 5 seconds as before, while
+   one sitting at a prompt costs nothing. */
+const SESSION_MS = 180000;
+
+export async function startInteractive({ lang, source, includes, onOut, onEnd }) {
+  const status = runnerStatus();
+  if (!status.ok) { onEnd({ stage: 'blocked', stderr: status.reason }); return null; }
+  const spec = LANGS[lang];
+  if (!spec) { onEnd({ stage: 'blocked', stderr: 'Unsupported language.' }); return null; }
+  if (typeof source !== 'string' || !source.trim()) { onEnd({ stage: 'blocked', stderr: 'There is nothing to run.' }); return null; }
+  if (source.length > SRC_MAX) { onEnd({ stage: 'blocked', stderr: 'That file is too large to run.' }); return null; }
+
+  const dir = await mkdtemp(join(tmpdir(), 'squadron-live-'));
+  const started = Date.now();
+  let done = false;
+  const cleanup = () => rm(dir, { recursive: true, force: true }).catch(() => {});
+
+  try {
+    const profile = join(dir, 'p.sb');
+    if (IS_MAC) await writeFile(profile, profileFor(dir));
+    const src = join(dir, 'main.' + spec.ext);
+    await writeFile(src, source);
+    for (const inc of includes || []) {
+      const safe = String(inc.name || '').replace(/[^A-Za-z0-9._-]/g, '');
+      if (!safe) continue;
+      await mkdir(join(dir, 'inc'), { recursive: true });
+      await writeFile(join(dir, 'inc', safe), String(inc.body || ''));
+      await writeFile(join(dir, safe), String(inc.body || ''));
+    }
+
+    let argv;
+    if (lang === 'cpp') {
+      await mkdir(join(dir, 'inc', 'bits'), { recursive: true });
+      await writeFile(join(dir, 'inc', 'bits', 'stdc++.h'), BITS);
+      const bin = join(dir, 'prog');
+      const c = await sandboxed(profile, [CXX, '-O1', '-std=c++17', '-w', '-I', join(dir, 'inc'), '-o', bin, src],
+        { ms: COMPILE_MS, cwd: dir, stdin: '' });
+      if (c.code !== 0 || c.timedOut) {
+        onEnd({ stage: 'compile', stderr: c.timedOut ? `Compiling took longer than ${COMPILE_MS / 1000}s.` : (c.stderr || 'Compilation failed.'), ms: Date.now() - started });
+        await cleanup(); return null;
+      }
+      if (c.stderr) onOut({ stream: 'stderr', chunk: c.stderr });
+      argv = [bin];
+    } else argv = [PY, '-u', src];      /* -u: unbuffered, or prompts arrive late */
+
+    const wrapper = IS_MAC ? [SANDBOX, '-f', profile, ...argv] : [BWRAP, ...bwrapArgs(dir), ...argv];
+    const child = spawn('/bin/sh', ['-c', `ulimit -t ${CPU_S} -f 8192 2>/dev/null; exec "$@"`, 'sh', ...wrapper], {
+      cwd: dir, detached: true,
+      env: { PATH: '/usr/bin:/bin:/usr/sbin:/sbin', TMPDIR: dir, HOME: dir, LC_ALL: 'C',
+             PYTHONUNBUFFERED: '1' }
+    });
+
+    let outN = 0;
+    const finish = (code, signal, timedOut) => {
+      if (done) return; done = true;
+      clearTimeout(timer);
+      onEnd({ stage: timedOut ? 'timeout' : 'run', exitCode: code, signal, ms: Date.now() - started, timedOut });
+      cleanup();
+    };
+    const killAll = () => { try { process.kill(-child.pid, 'SIGKILL'); } catch { try { child.kill('SIGKILL'); } catch {} } };
+    const timer = setTimeout(() => { killAll(); finish(null, 'SIGKILL', true); }, SESSION_MS);
+
+    const push = (stream) => (d) => {
+      if (done) return;
+      outN += d.length;
+      if (outN > CAP * 4) { killAll(); return; }       /* a runaway printer is still a runaway */
+      onOut({ stream, chunk: clip(d, dir, false) });
+    };
+    child.stdout.on('data', push('stdout'));
+    child.stderr.on('data', push('stderr'));
+    child.on('error', (e) => finish(-1, e.code || 'spawn-failed', false));
+    child.on('close', (code, signal) => finish(code, signal, false));
+
+    return {
+      write(line) { if (!done && child.stdin.writable) { try { child.stdin.write(String(line).slice(0, 4096) + '\n'); } catch {} } },
+      eof()  { if (!done && child.stdin.writable) { try { child.stdin.end(); } catch {} } },
+      kill() { if (!done) { killAll(); } }
+    };
+  } catch (e) {
+    onEnd({ stage: 'error', stderr: String(e && e.message || e), ms: Date.now() - started });
+    await cleanup();
+    return null;
+  }
+}
+
 /* A program killed by a signal writes nothing on its way out, so without these
    the output box was simply empty and the person had to guess. */
 const SIGNAL_REASON = {

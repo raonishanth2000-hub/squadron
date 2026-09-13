@@ -824,6 +824,8 @@
         <button class="code-scope" role="tab" data-scope="personal" aria-selected="true">Personal</button>
         <button class="code-scope" role="tab" data-scope="team" aria-selected="false">Team</button>
       </div>
+      <button class="icon-btn" id="code-help" aria-label="How the compiler works" title="How this works">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-info"/></svg></button>
       <button class="icon-btn" id="code-close" aria-label="Close the compiler">
         <svg class="icon icon-sm" aria-hidden="true"><use href="#i-x"/></svg></button>
     </div>
@@ -853,6 +855,8 @@
           <svg class="icon icon-sm" aria-hidden="true"><use href="#i-play"/></svg>Run</button>
         <button class="btn btn-ghost btn-sm" id="code-test">
           <svg class="icon icon-sm" aria-hidden="true"><use href="#i-check"/></svg>Run tests<span id="code-test-n"></span></button>
+        <button class="btn btn-ghost btn-sm" id="code-live" aria-pressed="false"
+          title="Type input while the program runs, the way a terminal does">Interactive</button>
         <button class="btn btn-ghost btn-sm" id="code-copy">Copy code</button>
         <button class="btn btn-ghost btn-sm" id="code-share">Share…</button>
         <button class="btn btn-ghost btn-sm" id="code-lib" hidden>Library…</button>
@@ -876,6 +880,15 @@
         <span class="code-meta mono" id="code-meta"></span>
         <button class="code-mini" id="code-copyout">Copy</button></div>
       <pre class="code-out" id="code-out" tabindex="0"></pre>
+
+      <!-- only while an interactive run is waiting for a line -->
+      <div class="code-live-row" id="code-live-row" hidden>
+        <span class="code-live-caret mono" aria-hidden="true">&rsaquo;</span>
+        <label class="sr" for="code-live-in">Type input for the running program</label>
+        <input class="code-live-in mono" id="code-live-in" autocomplete="off" spellcheck="false"
+          placeholder="type here and press Enter">
+        <button class="btn btn-sm btn-quiet-danger" id="code-live-stop">Stop</button>
+      </div>
     </div>
 
     <div class="code-empty" id="code-empty">

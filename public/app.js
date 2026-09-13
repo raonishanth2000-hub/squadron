@@ -2461,6 +2461,7 @@ async function openCode() {
   await loadSnippets();
 }
 function closeCode() {
+  if (C.running) { liveStop(); }
   flushSnippet();
   C.open = false;
   $('#code').hidden = true;
@@ -2586,8 +2587,13 @@ async function newSnippet() {
 }
 
 async function runSnippet() {
-  if (C.busy || !C.cur) return;
+  /* C.running guards the interactive path, C.busy the batch one — and the live
+     branch must be taken before C.busy is set, because only the batch path has
+     the finally that clears it. Setting it first left C.busy stuck true after
+     the first interactive run, and every later Run returned here in silence. */
+  if (C.busy || C.running || !C.cur) return;
   await flushSnippet();
+  if (C.live) return runLive();
   C.busy = true;
   const go = $('#code-go');
   go.disabled = true; go.dataset.busy = '1';
@@ -2766,6 +2772,87 @@ function setSplit(pct, remember = true) {
 
   bar.addEventListener('dblclick', () => { setSplit(SPLIT_DEFAULT); toast('Split reset', 'Back to the default height', 'ok'); });
 })();
+
+/* ---- interactive runs ----
+   The batch path posts the whole of stdin and waits. This one keeps the program
+   alive over the socket: output arrives as it is printed, and a typed line goes
+   back the way it would at a terminal. Which is what anyone who has used an IDE
+   expects when a program stops and asks them something. */
+try { C.live = localStorage.getItem('sq.live') === '1'; } catch {}
+const liveRow = () => $('#code-live-row');
+
+function paintLiveToggle() {
+  $('#code-live').setAttribute('aria-pressed', String(!!C.live));
+}
+$('#code-live').onclick = () => {
+  C.live = !C.live;
+  try { localStorage.setItem('sq.live', C.live ? '1' : '0'); } catch {}
+  paintLiveToggle();
+  toast(C.live ? 'Interactive run is on' : 'Interactive run is off',
+    C.live ? 'Run, then type answers underneath as the program asks for them.'
+           : 'Run uses whatever is in the Input (stdin) box.', 'ok');
+};
+paintLiveToggle();
+
+function liveAppend(text) {
+  const out = $('#code-out');
+  out.textContent += text;
+  out.scrollTop = out.scrollHeight;
+}
+function liveStop(quiet) {
+  if (!C.running) return;
+  C.running = false;
+  C.busy = false;
+  liveRow().hidden = true;
+  $('#code-go').disabled = false;
+  delete $('#code-go').dataset.busy;
+  if (!quiet) safeSend({ type: 'code-kill' });
+}
+$('#code-live-stop').onclick = () => { liveStop(); liveAppend('\n— stopped\n'); $('#code-meta').textContent = 'stopped'; };
+$('#code-live-in').addEventListener('keydown', (e) => {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const line = e.target.value;
+  e.target.value = '';
+  /* a pipe does not echo, so the line is shown here or it vanishes */
+  liveAppend(line + '\n');
+  safeSend({ type: 'code-stdin', line });
+});
+
+async function runLive() {
+  if (!S.squad) return toast('Join a squad first', 'Running code is scoped to a squad.');
+  C.running = true;
+  const go = $('#code-go');
+  go.disabled = true; go.dataset.busy = '1';
+  $('#code-out').textContent = '';
+  $('#code-out').dataset.state = 'wait';
+  $('#code-meta').textContent = 'running…';
+  liveRow().hidden = false;
+  setTimeout(() => $('#code-live-in').focus(), 80);
+  if (!(await waitForSocket(5000))) {
+    liveStop(true);
+    $('#code-out').textContent = 'Lost the connection to the server. Reload and try again.';
+    $('#code-out').dataset.state = 'bad';
+    return;
+  }
+  safeSend({ type: 'code-run', lang: $('#code-lang').value, source: $('#code-area').value });
+}
+
+/* called from the socket handler */
+function onCodeOut(msg) { if (C.running) liveAppend(msg.chunk || ''); }
+function onCodeEnd(msg) {
+  liveStop(true);
+  const label = msg.stage === 'compile' ? 'did not compile'
+    : msg.stage === 'blocked' ? 'blocked'
+    : msg.stage === 'error' ? 'failed'
+    : msg.timedOut ? 'stopped after 3 minutes'
+    : msg.signal ? 'killed · ' + msg.signal
+    : typeof msg.exitCode === 'number' ? 'exit ' + msg.exitCode : 'finished';
+  if (msg.stderr) liveAppend((($('#code-out').textContent && !$('#code-out').textContent.endsWith('\n')) ? '\n' : '') + msg.stderr);
+  if (!$('#code-out').textContent.trim()) $('#code-out').textContent = '(no output)';
+  $('#code-out').dataset.state = (msg.exitCode === 0 && !msg.timedOut) ? 'ok' : 'bad';
+  $('#code-meta').textContent = msg.ms ? `${label} · ${msg.ms} ms` : label;
+}
 
 $('#code-close').onclick = closeCode;
 $('#code-files').addEventListener('click', async (e) => {
@@ -4482,6 +4569,29 @@ let coBlock = null, coHole = null, coCard = null, coStep = 0, coSteps = [];
 /* A drawer that is translated off-screen still reports a full-size rect, so
    size alone is not enough — the target has to actually intersect the viewport
    or the spotlight lands on nothing. */
+/* A tour that stays inside the compiler. The workspace tour has to close the
+   compiler to point at anything, so these steps carry `inCode` and the engine
+   leaves it open. Written because the one thing nobody finds on their own is
+   where the input goes — a collapsed row between the buttons and the output. */
+const CODE_TOUR = [
+  { sel: '.code-scopes', inCode: true, side: 'bottom', k: 'Whose file',
+    t: 'Personal or Team', b: '<b>Personal</b> files are yours alone. <b>Team</b> files are visible to the whole squad and sync live as anyone types — useful for a shared template.' },
+  { sel: '#code-lang', inCode: true, side: 'bottom', k: 'Language',
+    t: 'C++ or Python', b: 'Set this to match the code you are writing. It decides which compiler runs and how the file is highlighted — the chip on the file tab shows the current setting.' },
+  { sel: '.code-editor', inCode: true, side: 'bottom', k: 'Editor',
+    t: 'Write it here', b: 'Saves as you type, so there is nothing to press. <b>Tab</b> indents, and the squad sees changes to a Team file straight away.' },
+  { sel: '.code-stdin', inCode: true, side: 'top', k: 'Input',
+    t: 'This is where input goes', b: 'If your program calls <b>input()</b> or reads <b>cin</b>, put what it should read here — one value per line, exactly as a judge would feed it. Leave it empty and the program hits end-of-file and stops.' },
+  { sel: '#code-go', inCode: true, side: 'top', k: 'Run',
+    t: 'Compile and run', b: 'The program runs in a sandbox with no network access and a few seconds of CPU, so an infinite loop stops itself rather than taking the server with it.' },
+  { sel: '#code-out', inCode: true, side: 'top', k: 'Output',
+    t: 'What it printed', b: 'Anything the program wrote, plus the exit code and how long it took. A crash is explained in words rather than left as a bare number.' },
+  { sel: '#code-cases', inCode: true, side: 'top', k: 'Test cases',
+    t: 'Many inputs at once', b: 'Save input and the answer you expect, then <b>Run tests</b> checks them all in one go — faster than pasting inputs one at a time.' },
+  { sel: '#code-split', inCode: true, side: 'top', k: 'Layout',
+    t: 'Drag to resize', b: 'Pull this bar to give more room to the editor or to the output. Arrow keys work too, and a double-click puts it back.' }
+];
+
 const coVisible = (sel) => {
   const e = $(sel);
   if (!e) return null;
@@ -4531,23 +4641,27 @@ function coGo(i) {
   const st = coSteps[coStep];
   /* the compiler owns the whole content area, so it must be shut before a
      step that points at something underneath it */
-  if (st.sel === '[data-code-open]') { if (!C.open) openCode(); }
+  if (st.inCode || st.sel === '[data-code-open]') { if (!C.open) openCode(); }
   else if (C.open) closeCode();
   if (drawerNeeded(st.sel)) { $('#side').dataset.open = '1'; $('#scrim').hidden = false; }
   else if (innerWidth <= 1023) closeDrawer();
   if (st.view) setView(st.view);
-  const wait = (st.view || st.sel === '[data-code-open]' || drawerNeeded(st.sel)) ? 320 : 0;
+  const wait = (st.view || st.inCode || st.sel === '[data-code-open]' || drawerNeeded(st.sel)) ? 320 : 0;
   setTimeout(coPlace, wait);
 }
 function coNext() { coStep >= coSteps.length - 1 ? coEnd() : coGo(coStep + 1); }
 
 function coEnd() {
+  const wasInCode = coSteps.some(s => s.inCode);
   if (coBlock) { coBlock.remove(); coHole.remove(); coCard.remove(); coBlock = coHole = coCard = null; }
   document.removeEventListener('keydown', coKeys);
   removeEventListener('resize', coPlace);
-  if (C.open) closeCode();
+  /* leave the compiler where the tour was describing it, rather than closing
+     the thing the person has just been taught to use */
+  if (C.open && !wasInCode) closeCode();
   if (innerWidth <= 1023) closeDrawer();
-  toast('Tour finished', 'Press ⌘K any time to jump anywhere.', 'ok');
+  toast(wasInCode ? 'That is the compiler' : 'Tour finished',
+    wasInCode ? 'Reopen this walk-through from the ⓘ at the top right.' : 'Press ⌘K any time to jump anywhere.', 'ok');
 }
 function coKeys(e) {
   if (e.key === 'Escape') { e.preventDefault(); coEnd(); }
@@ -4555,17 +4669,8 @@ function coKeys(e) {
   else if (e.key === 'ArrowLeft') { e.preventDefault(); coGo(coStep - 1); }
 }
 
-function startTour() {
-  if (coBlock) coEnd();                       /* never stack two tours */
-  /* A `view` step switches tabs to bring its target into being. That only works
-     if there is a squad behind those tabs — without one the tour would point at
-     empty space and read as broken. So with no squad, keep only what is
-     genuinely on screen: the switcher, the sidebar, the tabs and search. */
-  coSteps = S.squad
-    ? TOUR.filter(st => st.view || st.sel === '[data-code-open]' || drawerNeeded(st.sel) || coVisible(st.sel))
-    : TOUR.filter(st => drawerNeeded(st.sel) || coVisible(st.sel));
-  if (!coSteps.length) return;
-
+/* the spotlight, the card and its wiring — shared by both tours */
+function coBuild() {
   coBlock = el('div', 'co-block');
   coHole = el('div', 'co-hole'); coHole.setAttribute('aria-hidden', 'true');
   coCard = el('div', 'co-card',
@@ -4585,6 +4690,33 @@ function startTour() {
   coBlock.onclick = coEnd;
   document.addEventListener('keydown', coKeys);
   addEventListener('resize', coPlace);
+}
+
+/* the compiler's own walk-through, launched from the ⓘ in its header */
+function startCodeTour() {
+  if (coBlock) coEnd();
+  if (!C.open) openCode();
+  setTimeout(() => {
+    coSteps = CODE_TOUR.filter(st => coVisible(st.sel));
+    if (!coSteps.length) return toast('Open a file first', 'The walk-through points at a file you are editing.');
+    coBuild();
+    coGo(0);
+  }, C.open ? 60 : 420);
+}
+$('#code-help').onclick = startCodeTour;
+
+function startTour() {
+  if (coBlock) coEnd();                       /* never stack two tours */
+  /* A `view` step switches tabs to bring its target into being. That only works
+     if there is a squad behind those tabs — without one the tour would point at
+     empty space and read as broken. So with no squad, keep only what is
+     genuinely on screen: the switcher, the sidebar, the tabs and search. */
+  coSteps = S.squad
+    ? TOUR.filter(st => st.view || st.sel === '[data-code-open]' || drawerNeeded(st.sel) || coVisible(st.sel))
+    : TOUR.filter(st => drawerNeeded(st.sel) || coVisible(st.sel));
+  if (!coSteps.length) return;
+
+  coBuild();
 
   coGo(0);
   setTimeout(() => $('.co-next', coCard)?.focus(), 80);
@@ -4701,6 +4833,9 @@ function openSocket() {
       return;
     }
     if (msg.type === 'snippet-removed') { dropSnippet(msg.id); return; }
+    if (msg.type === 'code-out')     { onCodeOut(msg); return; }
+    if (msg.type === 'code-end')     { onCodeEnd(msg); return; }
+    if (msg.type === 'code-started') { return; }
     if (msg.type === 'invited') {
       /* The list was being refreshed without anything being redrawn, so the
          invitation only appeared after a reload — which is not an invitation
