@@ -4535,7 +4535,13 @@ function coKeys(e) {
 
 function startTour() {
   if (coBlock) coEnd();                       /* never stack two tours */
-  coSteps = TOUR.filter(st => st.view || st.sel === '[data-code-open]' || drawerNeeded(st.sel) || coVisible(st.sel));
+  /* A `view` step switches tabs to bring its target into being. That only works
+     if there is a squad behind those tabs — without one the tour would point at
+     empty space and read as broken. So with no squad, keep only what is
+     genuinely on screen: the switcher, the sidebar, the tabs and search. */
+  coSteps = S.squad
+    ? TOUR.filter(st => st.view || st.sel === '[data-code-open]' || drawerNeeded(st.sel) || coVisible(st.sel))
+    : TOUR.filter(st => drawerNeeded(st.sel) || coVisible(st.sel));
   if (!coSteps.length) return;
 
   coBlock = el('div', 'co-block');
@@ -4572,7 +4578,11 @@ function markTourSeen() {
 }
 /* called after boot and again after the first squad exists */
 function maybeOfferTour() {
-  if (!S.me || S.me.tourSeen || !S.squad) return;
+  /* No squad requirement. Someone signing in for the very first time is exactly
+     who the tour is for, and gating it on a squad meant they only ever met it
+     later — after joining one — by which point they had already worked the
+     place out. startTour drops the steps that need a squad. */
+  if (!S.me || S.me.tourSeen) return;
   setTimeout(offerTour, 900);
 }
 function offerTour() {
@@ -4670,8 +4680,17 @@ function openSocket() {
     }
     if (msg.type === 'snippet-removed') { dropSnippet(msg.id); return; }
     if (msg.type === 'invited') {
-      toast(`${msg.from} invited you to ${msg.squadName}`, 'Open it from the squad switcher when you are ready.', 'ok');
-      api('GET', '/api/me').then(d => { S.invites = d.pendingInvites; }).catch(() => {});
+      /* The list was being refreshed without anything being redrawn, so the
+         invitation only appeared after a reload — which is not an invitation
+         arriving, it is an invitation being found later. */
+      api('GET', '/api/me').then(d => {
+        S.invites = d.pendingInvites || [];
+        renderSquadList();
+        toast(`${msg.from} invited you to ${msg.squadName}`,
+          'It is in the squad switcher, top left — tap it to join.', 'ok');
+      }).catch(() => {
+        toast(`${msg.from} invited you to ${msg.squadName}`, 'Reload to see it.', 'ok');
+      });
       return;
     }
     if (msg.type === 'channel-removed') {
