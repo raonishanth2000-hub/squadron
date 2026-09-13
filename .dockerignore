@@ -1,0 +1,10 @@
+# Never bake local state into the image: data/ holds the live database, the
+# attachments and the dev certificate, and .tmp/ holds scratch logs.
+data
+.tmp
+node_modules
+npm-debug.log
+.DS_Store
+.git
+.claude
+*.md

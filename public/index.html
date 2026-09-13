@@ -1,0 +1,919 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Squadron</title>
+<!-- SVG first: it stays crisp on a hi-dpi tab and in the bookmarks bar. The PNG
+     is the fallback for anything that will not take an SVG icon, and doubles as
+     the home-screen icon on iOS. -->
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate icon" type="image/png" sizes="180x180" href="/apple-touch-icon.png">
+<link rel="apple-touch-icon" href="/apple-touch-icon.png">
+<meta name="theme-color" content="#090A10">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=Instrument+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;700&display=swap">
+<link rel="stylesheet" href="/app.css">
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false"><defs>
+<symbol id="i-hash" viewBox="0 0 24 24"><path d="M4 9h16M4 15h16M10 3 8 21M16 3l-2 18"/></symbol>
+<symbol id="i-chat" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+<symbol id="i-board" viewBox="0 0 24 24"><path d="M3 4h5v16H3zM10 4h5v11h-5zM17 4h4v7h-4z"/></symbol>
+<symbol id="i-trophy" viewBox="0 0 24 24"><path d="M7 4h10v5a5 5 0 0 1-10 0zM7 6H5.5a2.5 2.5 0 0 0 0 5H7M17 6h1.5a2.5 2.5 0 0 1 0 5H17M12 14v4M9 21h6M9.5 18h5"/></symbol>
+<symbol id="i-compass" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="m16 8-2.4 5.6L8 16l2.4-5.6z"/></symbol>
+<symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+<symbol id="i-mic" viewBox="0 0 24 24"><rect x="9" y="2" width="6" height="11" rx="3"/><path d="M19 10v2a7 7 0 0 1-14 0v-2M12 19v3"/></symbol>
+<symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 9-3 9h18s-3-2-3-9M13.7 21a2 2 0 0 1-3.4 0"/></symbol>
+<symbol id="i-sliders" viewBox="0 0 24 24"><path d="M4 21v-7M4 10V3M12 21v-9M12 8V3M20 21v-5M20 12V3M1 14h6M9 8h6M17 16h6"/></symbol>
+<symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></symbol>
+<symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></symbol>
+<symbol id="i-chev-r" viewBox="0 0 24 24"><path d="m9 18 6-6-6-6"/></symbol>
+<symbol id="i-chev-d" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"/></symbol>
+<symbol id="i-logout" viewBox="0 0 24 24"><path d="M15 4h3a2 2 0 0 1 2 2v12a2 2 0 0 1-2 2h-3"/><path d="M10 17l-5-5 5-5M5 12h10"/></symbol>
+<symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 0 0 .3 1.8l.1.1a2 2 0 1 1-2.8 2.8l-.1-.1a1.7 1.7 0 0 0-1.8-.3 1.7 1.7 0 0 0-1 1.5V21a2 2 0 1 1-4 0v-.1A1.7 1.7 0 0 0 9 19.4a1.7 1.7 0 0 0-1.8.3l-.1.1a2 2 0 1 1-2.8-2.8l.1-.1a1.7 1.7 0 0 0 .3-1.8 1.7 1.7 0 0 0-1.5-1H3a2 2 0 1 1 0-4h.1A1.7 1.7 0 0 0 4.6 9a1.7 1.7 0 0 0-.3-1.8l-.1-.1a2 2 0 1 1 2.8-2.8l.1.1a1.7 1.7 0 0 0 1.8.3H9a1.7 1.7 0 0 0 1-1.5V3a2 2 0 1 1 4 0v.1a1.7 1.7 0 0 0 1 1.5 1.7 1.7 0 0 0 1.8-.3l.1-.1a2 2 0 1 1 2.8 2.8l-.1.1a1.7 1.7 0 0 0-.3 1.8V9a1.7 1.7 0 0 0 1.5 1H21a2 2 0 1 1 0 4h-.1a1.7 1.7 0 0 0-1.5 1z"/></symbol>
+<symbol id="i-arrow-r" viewBox="0 0 24 24"><path d="M5 12h14m-7-7 7 7-7 7"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9.5" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></symbol>
+<symbol id="i-cal" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="17" rx="2"/><path d="M16 2v4M8 2v4M3 10h18"/></symbol>
+<symbol id="i-flame" viewBox="0 0 24 24"><path d="M8.5 14.5A3.5 3.5 0 0 0 12 18a4 4 0 0 0 4-4c0-4-5-9-5-9s-.6 2.5-2.1 4-2.4 3-2.4 5.5z"/></symbol>
+<symbol id="i-zap" viewBox="0 0 24 24"><path d="M13 2 3 14h9l-1 8 10-12h-9z"/></symbol>
+<symbol id="i-filter" viewBox="0 0 24 24"><path d="M22 3H2l8 9.5V19l4 2v-8.5z"/></symbol>
+<symbol id="i-more" viewBox="0 0 24 24"><circle cx="12" cy="12" r="1.3"/><circle cx="5" cy="12" r="1.3"/><circle cx="19" cy="12" r="1.3"/></symbol>
+<symbol id="i-send" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/></symbol>
+<symbol id="i-code" viewBox="0 0 24 24"><path d="m16 18 6-6-6-6M8 6l-6 6 6 6"/></symbol>
+<symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7.5"/><path d="m21 21-4.4-4.4"/></symbol>
+<symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></symbol>
+<symbol id="i-pin" viewBox="0 0 24 24"><path d="M12 17v5M9 10.8a2 2 0 0 1-1.1 1.8l-1.8.9A2 2 0 0 0 5 15.3V16a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-.7a2 2 0 0 0-1.1-1.8l-1.8-.9A2 2 0 0 1 15 10.8V7a1 1 0 0 1 1-1 2 2 0 0 0 0-4H8a2 2 0 0 0 0 4 1 1 0 0 1 1 1z"/></symbol>
+<symbol id="i-branch" viewBox="0 0 24 24"><circle cx="6" cy="6" r="2.5"/><circle cx="6" cy="18" r="2.5"/><circle cx="18" cy="6" r="2.5"/><path d="M6 8.5v7M18 8.5a8 8 0 0 1-8 8h-1.5"/></symbol>
+<symbol id="i-pause" viewBox="0 0 24 24"><path d="M9 4v16M15 4v16"/></symbol>
+<symbol id="i-play" viewBox="0 0 24 24"><path d="M7 4.5v15l13-7.5z"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5.2l3.4 2"/></symbol>
+<symbol id="i-medal" viewBox="0 0 24 24"><circle cx="12" cy="9" r="6"/><path d="m15.5 13.9 1.5 8.1-5-3-5 3 1.5-8.1"/></symbol>
+<symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></symbol>
+<symbol id="i-move" viewBox="0 0 24 24"><path d="m15 10 5 5-5 5M4 4v7a4 4 0 0 0 4 4h12"/></symbol>
+<symbol id="i-move-l" viewBox="0 0 24 24"><path d="m9 10-5 5 5 5M20 4v7a4 4 0 0 1-4 4H4"/></symbol>
+<symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 16v-4.5M12 8h.01"/></symbol>
+<symbol id="i-heart" viewBox="0 0 24 24"><path d="M20.8 5.6a5 5 0 0 0-7.1 0L12 7.3l-1.7-1.7a5 5 0 1 0-7.1 7.1l8.8 8.8 8.8-8.8a5 5 0 0 0 0-7.1z"/></symbol>
+<symbol id="i-balloon" viewBox="0 0 24 24"><path d="M12 2a6 6 0 0 1 6 6c0 4-3.5 7.5-6 8.5C9.5 15.5 6 12 6 8a6 6 0 0 1 6-6z"/><path d="m11 16.5-1 2h4l-1-2M12 18.5V22"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.2"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="4" y="10" width="16" height="11" rx="2"/><path d="M8 10V7a4 4 0 0 1 8 0v3"/></symbol>
+<symbol id="i-trend" viewBox="0 0 24 24"><path d="m3 16 5-5 4 4 8-8M16 7h5v5"/></symbol>
+</defs></svg>
+<a class="skip" href="#main">Skip to main content</a>
+<div class="sr" id="live" role="status" aria-live="polite" aria-atomic="true"></div>
+
+<div class="lp" id="lp" hidden>
+  <div class="spot" id="spot" aria-hidden="true"></div>
+
+  <header class="lp-nav" id="lp-nav">
+    <div class="lp-wrap">
+      <span class="lp-mark"><span class="glyph"><svg class="icon" aria-hidden="true"><use href="#i-balloon"/></svg></span>Squadron</span>
+      <nav class="lp-links" aria-label="Sections">
+        <a href="#lp-drift">Why</a><a href="#lp-ladder">Ladder</a><a href="#lp-feat">Workspace</a><a href="#lp-all">Everything</a><a href="#lp-xp">XP</a><a href="#lp-kinds">Squads</a>
+      </nav>
+      <button class="btn btn-primary lp-enter" data-enter>Open the workspace <svg class="icon icon-sm" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+    </div>
+  </header>
+
+  <section class="lp-hero" id="lp-hero">
+    <div class="hud" aria-hidden="true">
+      <span class="hud-tl">Squadron · campus node 04</span>
+      <span class="hud-tr">Status · <span class="ok">recruiting</span></span>
+      <span class="hud-bl">ICPC-Amritapuri-2026 · <b>T−11d</b></span>
+      <span class="hud-br">Local · <span id="hud-clock">--:--:--</span></span>
+    </div>
+    <div class="lp-wrap">
+      <div>
+        <span class="lp-eyebrow"><svg class="icon" aria-hidden="true"><use href="#i-balloon"/></svg>ICPC · GSoC · Hackathons · Study groups</span>
+        <h1 class="lp-h1"><span class="w">Eleven</span> <span class="w">days</span> <span class="w">to</span> <span class="w">regionals.</span> <span class="w">Where</span> <span class="w">is</span> <span class="w">your</span> <span class="w">team</span> <em class="w">actually</em> <span class="w">working?</span></h1>
+        <p class="lp-lede">Channels, voice notes, a C++ and Python compiler, video rooms, a task board and an XP economy in one workspace. Built for students who form <b>five squads a year</b> and lose three of them to a dead group chat.</p>
+        <div class="lp-cta">
+          <button class="btn btn-primary btn-lg lp-enter" data-enter>Open the workspace <svg class="icon" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+          <a class="btn btn-lg btn-ghost" href="#lp-xp">See how XP works</a>
+        </div>
+        <div class="bot" id="bot" data-mood="track">
+        <svg class="bot-svg" viewBox="0 0 130 164" role="img" aria-label="UNIT-03, a robot that watches the cursor">
+          <ellipse cx="65" cy="156" rx="36" ry="4.5" fill="rgba(0,0,0,.42)"/>
+          <g class="bot-body">
+            <circle class="bot-glow" cx="65" cy="11" r="9" fill="#D97B2E"/>
+            <path d="M65 27v-10" stroke="#3A4055" stroke-width="3" stroke-linecap="round"/>
+            <circle class="bot-ring" cx="65" cy="11" r="6" fill="none" stroke="#E9B949" stroke-width="1.6" opacity="0"/>
+            <circle class="bot-ring" cx="65" cy="11" r="6" fill="none" stroke="#E9B949" stroke-width="1.6" opacity="0"/>
+            <circle class="bot-bulb" cx="65" cy="11" r="5.5" fill="#D97B2E"/>
+            <g class="bot-head">
+              <rect x="22" y="45" width="8" height="20" rx="3" fill="#1A1E2A" stroke="#2F3549" stroke-width="1.2"/>
+              <rect x="100" y="45" width="8" height="20" rx="3" fill="#1A1E2A" stroke="#2F3549" stroke-width="1.2"/>
+              <rect x="30" y="27" width="70" height="56" rx="17" fill="#232838" stroke="#2F3549" stroke-width="1.5"/>
+              <rect x="38" y="39" width="54" height="32" rx="12" fill="#070910"/>
+              <g class="bot-track">
+                <circle class="bot-eye" cx="54" cy="55" r="5.6" fill="#5E9BF7"/>
+                <circle class="bot-eye" cx="76" cy="55" r="5.6" fill="#5E9BF7"/>
+              </g>
+              <g class="bot-happy">
+                <path d="M47 58q7-10 14 0" fill="none" stroke="#E9B949" stroke-width="4.2" stroke-linecap="round"/>
+                <path d="M69 58q7-10 14 0" fill="none" stroke="#E9B949" stroke-width="4.2" stroke-linecap="round"/>
+              </g>
+            </g>
+            <rect x="57" y="82" width="16" height="9" fill="#1A1E2A"/>
+            <rect x="21" y="95" width="10" height="28" rx="5" fill="#232838" stroke="#2F3549" stroke-width="1.2"/>
+            <rect x="99" y="95" width="10" height="28" rx="5" fill="#232838" stroke="#2F3549" stroke-width="1.2"/>
+            <rect x="34" y="89" width="62" height="46" rx="15" fill="#1A1E2A" stroke="#2F3549" stroke-width="1.5"/>
+            <rect x="43" y="97" width="44" height="15" rx="4" fill="#070910"/>
+            <text class="bot-read" x="65" y="108" text-anchor="middle">TRACKING</text>
+            <circle class="led" cx="50" cy="124" r="3" fill="#2F3549"/>
+            <circle class="led" cx="60" cy="124" r="3" fill="#2F3549"/>
+            <circle class="led" cx="70" cy="124" r="3" fill="#2F3549"/>
+            <circle class="led" cx="80" cy="124" r="3" fill="#2F3549"/>
+            <path d="M41 135h48l9 15H32z" fill="#232838" stroke="#2F3549" stroke-width="1.5" stroke-linejoin="round"/>
+          </g>
+        </svg>
+        <p class="bot-cap mono">UNIT-03 · keeps the mock-contest clock</p>
+      </div>
+        <div class="lp-facts">
+          <div class="fact"><b class="mono" data-count="3">3</b><span>people on an ICPC team. Exactly three.</span></div>
+          <div class="fact"><b class="mono" data-count="2">2</b><span>languages you can compile and run in the workspace.</span></div>
+          <div class="fact"><b class="mono" data-count="1">1</b><span>place all of it should live.</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="sb" id="sb">
+          <div class="sb-h">
+            <div><div class="t">ICPC Amritapuri 2026 — Standings</div><div class="sub">Elapsed <span id="sb-clock">01:47</span> of 05:00 · 12 problems</div></div>
+            <span class="sb-live"><span class="pulse" id="sb-pulse"></span><span id="sb-state">judging</span></span>
+            <button class="icon-btn" id="sb-toggle" aria-pressed="false" aria-label="Pause the live standings"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-pause"/></svg></button>
+          </div>
+          <div class="sb-scroll">
+            <div class="sb-body" id="sb-body">
+              <div class="sb-legend"><span class="sb-rk">#</span><span class="sb-tm">Team</span>
+                <span class="sb-cells" aria-hidden="true"><span class="sb-c" style="background:none;border:0;color:var(--text-3)">A</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">B</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">C</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">D</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">E</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">F</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">G</span><span class="sb-c" style="background:none;border:0;color:var(--text-3)">H</span></span>
+                <span class="sb-n">S</span><span class="sb-p">Pen</span></div>
+
+              <div class="sb-row" data-team="Nucleus" data-solved="4" data-pen="232">
+                <span class="sb-rk">1</span><span class="sb-tm"><span class="av av-s" style="background:linear-gradient(140deg,#E45C56,#B03A35);width:22px;height:22px;font-size:9px">NU</span><span class="nm">Nucleus</span></span>
+                <span class="sb-cells"><span class="sb-c ac">12</span><span class="sb-c ac">34</span><span class="sb-c ac">71</span><span class="sb-c ac">95</span><span class="sb-c wa">−1</span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span></span>
+                <span class="sb-n">4</span><span class="sb-p">232</span>
+              </div>
+
+              <div class="sb-row" data-team="Segfault Sentinels" data-solved="4" data-pen="251">
+                <span class="sb-rk">2</span><span class="sb-tm"><span class="av av-s" style="background:linear-gradient(140deg,#9A7BF0,#6F51CC);width:22px;height:22px;font-size:9px">SS</span><span class="nm">Segfault Sentinels</span></span>
+                <span class="sb-cells"><span class="sb-c ac">18</span><span class="sb-c ac">41</span><span class="sb-c ac">88</span><span class="sb-c"></span><span class="sb-c ac">104</span><span class="sb-c wa">−2</span><span class="sb-c"></span><span class="sb-c"></span></span>
+                <span class="sb-n">4</span><span class="sb-p">251</span>
+              </div>
+
+              <div class="sb-row you" data-team="Alpha Centauri" data-solved="3" data-pen="107">
+                <span class="sb-rk">3</span><span class="sb-tm"><span class="av av-s" style="background:linear-gradient(140deg,#E9B949,#C98A22);width:22px;height:22px;font-size:9px">AC</span><span class="nm">Alpha Centauri</span><span class="chip c-gold">You</span></span>
+                <span class="sb-cells"><span class="sb-c ac">15</span><span class="sb-c ac">29</span><span class="sb-c ac">63</span><span class="sb-c wa">−2</span><span class="sb-c pend">?</span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span></span>
+                <span class="sb-n">3</span><span class="sb-p">107</span>
+              </div>
+
+              <div class="sb-row" data-team="Null Pointer Exception" data-solved="3" data-pen="161">
+                <span class="sb-rk">4</span><span class="sb-tm"><span class="av av-s" style="background:linear-gradient(140deg,#5E9BF7,#2F6BC4);width:22px;height:22px;font-size:9px">NP</span><span class="nm">Null Pointer Exception</span></span>
+                <span class="sb-cells"><span class="sb-c ac">22</span><span class="sb-c ac">47</span><span class="sb-c"></span><span class="sb-c ac">92</span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span></span>
+                <span class="sb-n">3</span><span class="sb-p">161</span>
+              </div>
+
+              <div class="sb-row" data-team="Team Meridian" data-solved="2" data-pen="89">
+                <span class="sb-rk">5</span><span class="sb-tm"><span class="av av-s" style="background:linear-gradient(140deg,#3FB980,#2A8259);width:22px;height:22px;font-size:9px">TM</span><span class="nm">Team Meridian</span></span>
+                <span class="sb-cells"><span class="sb-c ac">31</span><span class="sb-c ac">58</span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c"></span></span>
+                <span class="sb-n">2</span><span class="sb-p">89</span>
+              </div>
+
+              <div class="sb-row" data-team="Binary Bandits" data-solved="2" data-pen="104">
+                <span class="sb-rk">6</span><span class="sb-tm"><span class="av av-s" style="background:linear-gradient(140deg,#3FB3C7,#2A8494);width:22px;height:22px;font-size:9px">BB</span><span class="nm">Binary Bandits</span></span>
+                <span class="sb-cells"><span class="sb-c ac">25</span><span class="sb-c"></span><span class="sb-c ac">79</span><span class="sb-c"></span><span class="sb-c"></span><span class="sb-c wa">−3</span><span class="sb-c"></span><span class="sb-c"></span></span>
+                <span class="sb-n">2</span><span class="sb-p">104</span>
+              </div>
+            </div>
+          </div>
+          <div class="sb-f">
+            <span class="sb-key"><i style="background:var(--ok)"></i>solved, minute</span>
+            <span class="sb-key"><i style="background:var(--danger)"></i>wrong attempts</span>
+            <span class="sb-key"><i style="background:var(--azure)"></i>pending</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <div class="lp-wrap">
+
+    <section class="lp-sec" id="lp-drift">
+      <div class="lp-head"><span class="eyebrow">The problem</span>
+        <h2>A squad is three people and four tools that do not know about each other.</h2>
+        <p>Nothing here is a tooling gap in the abstract. This is where the work actually goes missing.</p>
+      </div>
+      <div class="drift">
+        <div class="drift-i"><span class="n">01</span><h3>The group chat</h3><p>Where the good idea was posted at 01:40 and scrolled past by morning. No structure, no history you can search, no way to say who owns it.</p></div>
+        <div class="drift-i"><span class="n">02</span><h3>The shared doc</h3><p>The proposal, the template library, the one snippet that actually worked. Version three lives in someone's Downloads folder and nobody can find it at 2am.</p></div>
+        <div class="drift-i"><span class="n">03</span><h3>The board nobody opens</h3><p>Set up with great intentions in week one. Abandoned by week three because finishing a card gave you nothing back.</p></div>
+      </div>
+    </section>
+
+    <section class="lp-sec" id="lp-ladder">
+      <div class="lp-head"><span class="eyebrow">Campus telemetry</span>
+        <h2>Everyone on campus sits somewhere on the same ladder.</h2>
+        <p>Connect a judge and Squadron reads your rating, then plots the whole cohort on one scale. A squad can see the range it has — and the range it is missing — <b>before it commits to three people for a season.</b></p>
+      </div>
+      <figure class="ladder" role="img" aria-label="Codeforces rating ladder from 800 to 3000, with seven cohort members plotted: Ishaan 1312 pupil, Ananya 1490 specialist, Dev 1655 expert, Rohit 1784 expert, Aarav 1972 candidate master, Meera 2140 master, Kavya 2415 grandmaster.">
+        <div class="ladder-scroll">
+          <div class="ladder-plot">
+        <span class="lmark lo" style="left:23.27%" title="Ishaan · 1312"><span class="av" style="background:linear-gradient(140deg,#3FB980,#2A8259)">IV</span><span class="r mono" style="color:var(--rt-green)">1312</span></span>
+        <span class="lmark hi" style="left:31.36%" title="Ananya · 1490"><span class="av" style="background:linear-gradient(140deg,#3FB3C7,#2A8494)">AR</span><span class="r mono" style="color:var(--rt-cyan)">1490</span></span>
+        <span class="lmark lo" style="left:38.86%" title="Dev · 1655"><span class="av" style="background:linear-gradient(140deg,#5E9BF7,#2F6BC4)">DP</span><span class="r mono" style="color:var(--rt-blue)">1655</span></span>
+        <span class="lmark hi" style="left:44.73%" title="Rohit · 1784"><span class="av" style="background:linear-gradient(140deg,#5E9BF7,#2F6BC4)">RS</span><span class="r mono" style="color:var(--rt-blue)">1784</span></span>
+        <span class="lmark lo you" style="left:53.27%" title="Aarav · 1972"><span class="av" style="background:linear-gradient(140deg,#E9B949,#C98A22)">AK</span><span class="r mono" style="color:var(--rt-violet)">1972</span></span>
+        <span class="lmark hi" style="left:60.91%" title="Meera · 2140"><span class="av" style="background:linear-gradient(140deg,#9A7BF0,#6F51CC)">MI</span><span class="r mono" style="color:var(--rt-orange)">2140</span></span>
+        <span class="lmark lo" style="left:73.41%" title="Kavya · 2415"><span class="av" style="background:linear-gradient(140deg,#E45C56,#B03A35)">KN</span><span class="r mono" style="color:var(--rt-red)">2415</span></span>
+            <div class="ladder-bar"><span class="lseg" style="--c:var(--rt-gray);flex:400"></span><span class="lseg" style="--c:var(--rt-green);flex:200"></span><span class="lseg" style="--c:var(--rt-cyan);flex:200"></span><span class="lseg" style="--c:var(--rt-blue);flex:300"></span><span class="lseg" style="--c:var(--rt-violet);flex:200"></span><span class="lseg" style="--c:var(--rt-orange);flex:300"></span><span class="lseg" style="--c:var(--rt-red);flex:600"></span></div>
+          </div>
+          <div class="ladder-axis"><span class="ltick" style="left:0.00%">800</span><span class="ltick" style="left:18.18%">1200</span><span class="ltick" style="left:27.27%">1400</span><span class="ltick" style="left:36.36%">1600</span><span class="ltick" style="left:50.00%">1900</span><span class="ltick" style="left:59.09%">2100</span><span class="ltick" style="left:72.73%">2400</span><span class="ltick" style="left:100.00%">3000</span></div>
+        </div>
+        <ul class="ladder-legend"><li class="lkey"><i style="background:var(--rt-gray)"></i>Newbie</li><li class="lkey"><i style="background:var(--rt-green)"></i>Pupil</li><li class="lkey"><i style="background:var(--rt-cyan)"></i>Specialist</li><li class="lkey"><i style="background:var(--rt-blue)"></i>Expert</li><li class="lkey"><i style="background:var(--rt-violet)"></i>Candidate master</li><li class="lkey"><i style="background:var(--rt-orange)"></i>Master</li><li class="lkey"><i style="background:var(--rt-red)"></i>Grandmaster</li></ul>
+      </figure>
+    </section>
+
+    <section class="lp-sec" id="lp-feat">
+      <div class="lp-head"><span class="eyebrow">The workspace</span>
+        <h2>Channels, compiler and board — scoped to the squad, not to you.</h2>
+        <p>Switch squads from the panel at the top and everything changes with it: the channels, the board, the calendar, the standings. <b>One workspace per team, not one workspace per person.</b></p>
+      </div>
+
+      <div class="feat">
+        <div class="feat-txt">
+          <span class="eyebrow">Channels</span>
+          <h3>Discussion that survives the night</h3>
+          <p>Make as many channels as the squad needs and give each one its own symbol. Your messages sit right, everyone else's left, and unread counts tell you where the conversation moved.</p>
+          <ul class="feat-list">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Any emoji or sign as the channel icon — not just <b>#</b></li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Hold the microphone to send a voice note instead of typing</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Code arrives as a real block with a copy button, not a wall of text</li>
+          </ul>
+        </div>
+        <div class="shot">
+          <div class="shot-h"><svg class="icon" aria-hidden="true"><use href="#i-hash"/></svg>problem-sets</div>
+          <div class="shot-b">
+            <article class="msg"><span class="av av-m" style="background:linear-gradient(140deg,#9A7BF0,#6F51CC)">MI</span>
+              <div><div class="msg-head"><span class="msg-name">Meera Iyer</span><span class="msg-handle mono" style="color:var(--rt-orange)">meera_ct</span><span class="msg-time mono">21:14</span></div>
+                <div class="msg-body"><p>Tie-break has to be by index or the greedy picks wrong on equal costs.</p>
+                  <div class="msg-code-h"><span class="msg-code-l">cpp</span></div>
+                  <pre class="msg-code">sort(all(v), [](auto&amp; a, auto&amp; b){
+    return a.c * b.i &lt; b.c * a.i;
+});</pre>
+                  <div class="reacts"><span class="react" data-mine="1"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>3</span><span class="react"><svg class="icon" aria-hidden="true"><use href="#i-balloon"/></svg>2</span></div>
+                </div></div></article>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat flip">
+        <div class="feat-txt">
+          <span class="eyebrow">Task board</span>
+          <h3>Every card is worth something</h3>
+          <p>Drag a card into Solved and the XP pays out immediately — to you and to the standings. Move it back and the XP is withdrawn. Every task is worth the same, so nobody can price their own work.</p>
+          <ul class="feat-list">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Drag with a mouse, or pick up and move with the keyboard</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>A flat <b>5 XP</b> per task, set by the server — not by the filer</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Assign it, tag it, and see it land on the calendar</li>
+          </ul>
+        </div>
+        <div class="shot">
+          <div class="shot-h"><svg class="icon" aria-hidden="true"><use href="#i-board"/></svg>Practice Sprint 14 · 11 tasks</div>
+          <div class="shot-b tight" style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+            <div class="col" style="border-radius:var(--r-md)">
+              <div class="col-h"><span class="col-dot" style="background:var(--azure)"></span><h3>In progress</h3><span class="col-n mono">1</span></div>
+              <div class="col-list" style="padding:0 8px 8px">
+                <div class="card" style="cursor:default">
+                  <div class="card-top"><span class="prio p-hi"></span><span class="card-t">Li Chao tree</span></div>
+                  <div class="card-tags"><span class="tag">dp</span><span class="tag">geometry</span></div>
+                  <div class="card-foot"><span class="card-xp"><svg class="icon" aria-hidden="true"><use href="#i-zap"/></svg>5</span><span class="av av-s" style="background:linear-gradient(140deg,#E9B949,#C98A22)">AK</span></div>
+                </div>
+              </div>
+            </div>
+            <div class="col" style="border-radius:var(--r-md)">
+              <div class="col-h"><span class="col-dot" style="background:var(--ok)"></span><h3>Solved</h3><span class="col-n mono">3</span></div>
+              <div class="col-list" style="padding:0 8px 8px">
+                <div class="card" style="cursor:default">
+                  <div class="card-top"><span class="prio p-lo"></span><span class="card-t">Segment tree beats</span></div>
+                  <div class="card-tags"><span class="tag">trees</span></div>
+                  <div class="card-foot"><span class="card-xp"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>5</span><span class="av av-s" style="background:linear-gradient(140deg,#E9B949,#C98A22)">AK</span></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="feat">
+        <div class="feat-txt">
+          <span class="eyebrow">Team finder</span>
+          <h3>Open slots, not open calls</h3>
+          <p>Squads publish the slots they still need and the skill they are missing. Request one and the captain sees your rating, your XP and your last five contests — not a paragraph about yourself.</p>
+          <ul class="feat-list">
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Filter by ICPC, GSoC, hackathon or study group</li>
+            <li><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg>Slot counters that are honest about how full a team is</li>
+          </ul>
+        </div>
+        <div class="shot">
+          <div class="shot-h"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg>Find a squad · 34 recruiting</div>
+          <div class="shot-b">
+            <article class="squad" style="background:var(--surface)">
+              <div class="squad-top"><span class="squad-av" style="background:var(--gold-wash);color:var(--gold);border:1px solid var(--gold-dim)">ICPC</span>
+                <div class="squad-t"><h3>Nucleus — Amritapuri Regionals</h3><div class="squad-org mono">ICPC 2026 · on-site Dec 14</div></div></div>
+              <p class="squad-d">Two 2100+ members looking for a third who is comfortable with computational geometry.</p>
+              <div class="slots"><span class="slot-dots"><span class="slot filled"></span><span class="slot filled"></span><span class="slot"></span></span><span class="slot-t"><b>1</b> slot left of 3</span></div>
+            </article>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-sec" id="lp-xp">
+      <div class="lp-head"><span class="eyebrow">The economy</span>
+        <h2>XP for the work that actually moves a squad forward.</h2>
+        <p>Not logins. Not streak-bait. XP is paid when a task reaches Solved — a flat rate the server sets, so nobody can inflate their own card. <b>Drag it back out and the XP goes with it.</b></p>
+      </div>
+      <div class="xpband">
+        <div class="ring" style="width:132px;height:132px">
+          <svg viewBox="0 0 120 120" width="132" height="132" role="img" aria-label="Level 14, 56 percent of the way to level 15">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#232838" stroke-width="9"/>
+            <circle id="lp-arc" cx="60" cy="60" r="52" fill="none" stroke="#E9B949" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="144"/>
+          </svg>
+          <div class="ring-mid"><span class="ring-n mono">4</span><span class="ring-l">Level</span></div>
+        </div>
+        <div class="xp-rules">
+          <div class="xp-rule"><b>+5</b><span>Task dragged into Solved — every task, same rate</span></div>
+          <div class="xp-rule"><b>−5</b><span>Solved task dragged back out of the column</span></div>
+          <div class="xp-rule"><b>=</b><span>The server sets the amount, so nobody prices their own card</span></div>
+          <div class="xp-rule"><b>&#8942;</b><span>Every change is a ledger line you can read back</span></div>
+        </div>
+      </div>
+    </section>
+
+    <section class="lp-sec" id="lp-kinds">
+      <div class="lp-head"><span class="eyebrow">Squad types</span>
+        <h2>Four shapes of team, one workspace each.</h2>
+      </div>
+      <div class="kinds">
+        <div class="kind"><span class="kic" style="background:var(--gold-wash);color:var(--gold)"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-trophy"/></svg></span><h3>ICPC teams</h3><p>A small roster, a shared template file you can actually run, and a mock-contest calendar.</p><span class="mono">Board · compiler · mocks</span></div>
+        <div class="kind"><span class="kic" style="background:var(--azure-wash);color:var(--azure)"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-branch"/></svg></span><h3>GSoC circles</h3><p>Proposal drafts reviewed line by line, org shortlists, and the coding-period timeline once you are in.</p><span class="mono">Drafts · reviews · timeline</span></div>
+        <div class="kind"><span class="kic" style="background:var(--warn-wash);color:var(--warn)"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-zap"/></svg></span><h3>Hackathon squads</h3><p>Thirty-six hours, a locked problem statement, and a board that tells everyone what is unclaimed right now.</p><span class="mono">Roles · board · demo</span></div>
+        <div class="kind"><span class="kic" style="background:var(--ok-wash);color:var(--ok)"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-target"/></svg></span><h3>Study groups</h3><p>A rated ladder, one problem a day, editorial at a fixed hour, and a rule about missing three days.</p><span class="mono">Ladder · streaks · standings</span></div>
+      </div>
+    </section>
+
+    <section class="lp-sec" id="lp-all">
+      <div class="lp-head"><span class="eyebrow">Everything in the box</span>
+        <h2>What you get the moment you sign in.</h2>
+        <p>No trial tier, no waiting list, no add-ons. Every item below is built and working — make a squad and it is all there.</p>
+      </div>
+
+      <div class="caps">
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-chat"/></svg></span>
+          <h3>Channels, your way</h3>
+          <p>Add as many as you need and give each one an emoji or symbol instead of a hash.</p>
+          <span class="cap-tag mono">unread counts</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg></span>
+          <h3>Voice notes</h3>
+          <p>Hold the microphone when explaining a bug out loud beats typing it. The waveform follows your actual voice.</p>
+          <span class="cap-tag mono">up to 90s</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-code"/></svg></span>
+          <h3>C++ and Python, built in</h3>
+          <p>Write, run and read the output without leaving the squad. <b>Personal</b> files stay yours; <b>Team</b> files sync live as anyone types.</p>
+          <span class="cap-tag mono">sandboxed · no network</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg></span>
+          <h3>Video rooms</h3>
+          <p>Camera, microphone and screen share, with a roster that shows who is in and what they have switched on.</p>
+          <span class="cap-tag mono">lands in the calendar</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-board"/></svg></span>
+          <h3>Task board</h3>
+          <p>Drag into Solved and the XP pays out. Every task is worth the same flat 5, decided by the server.</p>
+          <span class="cap-tag mono">5 XP a task</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-cal"/></svg></span>
+          <h3>Calendar</h3>
+          <p>Due dates, rounds and every meeting the squad schedules, on one month view.</p>
+          <span class="cap-tag mono">per squad</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-trophy"/></svg></span>
+          <h3>Standings &amp; XP</h3>
+          <p>A running ledger of what you earned and when. Undo the work and the entry reverses.</p>
+          <span class="cap-tag mono">auditable</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-check"/></svg></span>
+          <h3>Reactions &amp; code blocks</h3>
+          <p>Seven reactions that mean something, and pasted code that keeps its shape with a copy button.</p>
+          <span class="cap-tag mono">in every channel</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-send"/></svg></span>
+          <h3>Invite by link</h3>
+          <p>Copy a link and send it however you already talk. <b>Squadron never emails anyone.</b></p>
+          <span class="cap-tag mono">no inbox required</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-search"/></svg></span>
+          <h3>Jump to anything</h3>
+          <p>One shortcut searches channels, tasks, squads and actions together.</p>
+          <span class="cap-tag mono">&#8984;K</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>
+          <h3>A guided walk-through</h3>
+          <p>Offered once when you arrive, and reachable from search for good after that.</p>
+          <span class="cap-tag mono">skippable</span>
+        </article>
+
+        <article class="cap">
+          <span class="cap-i"><svg class="icon" aria-hidden="true"><use href="#i-balloon"/></svg></span>
+          <h3>Four kinds of squad</h3>
+          <p>ICPC, GSoC, hackathon or study group — each opens with channels and a sprint that suit it.</p>
+          <span class="cap-tag mono">any roster size</span>
+        </article>
+      </div>
+    </section>
+
+    <section class="lp-close">
+      <h2>Your team already exists. Give it somewhere to work.</h2>
+      <p>Make a squad, invite your team with a link, and everything below is yours — channels, the compiler, the board and a video room.</p>
+      <div class="lp-cta" style="justify-content:center">
+        <button class="btn btn-primary btn-lg lp-enter" data-enter>Open the workspace <svg class="icon" aria-hidden="true"><use href="#i-arrow-r"/></svg></button>
+      </div>
+    </section>
+
+    <footer class="lp-foot">
+      <span class="lp-mark" style="font-size:13px"><span class="glyph" style="width:22px;height:22px;border-radius:6px"><svg class="icon" style="width:13px;height:13px" aria-hidden="true"><use href="#i-balloon"/></svg></span>Squadron</span>
+      <span class="mono">Interactive prototype · seeded with example squads</span>
+      <span class="mono" style="margin-left:auto">Balloons are earned, not given</span>
+    </footer>
+  </div>
+</div>
+
+<div class="cur" aria-hidden="true"><span class="cur-ring" id="cur-ring"></span><span class="cur-dot" id="cur-dot"></span></div>
+<div class="wipe" id="wipe" hidden aria-hidden="true">
+  <span class="wipe-bloom" aria-hidden="true"></span>
+  <span class="wipe-grain" aria-hidden="true"></span>
+  <div class="wipe-inner">
+    <span class="wipe-tag">Squadron · workspace</span>
+    <p class="wipe-hi" id="wipe-hi">Welcome,</p>
+    <h2 class="wipe-type"><span id="wipe-text"></span><i class="wipe-caret"></i><span class="wipe-sheen" aria-hidden="true"></span></h2>
+    <div class="wipe-bar"><span id="wipe-bar-f"></span></div>
+  </div>
+</div>
+
+
+<!-- ============================ SIGN IN ============================ -->
+<div class="gate" id="gate" hidden>
+  <div class="gate-panel">
+    <span class="auth-mark"><span class="glyph"><svg class="icon" aria-hidden="true"><use href="#i-balloon"/></svg></span>Squadron</span>
+    <h1 class="gate-h">Where CS squads actually work.</h1>
+    <p class="gate-sub">Channels, a task board with real XP, a shared calendar and meetings — one workspace per squad, for ICPC teams, GSoC circles, hackathon crews and study groups.</p>
+
+    <div class="gate-tabs" role="tablist">
+      <button class="gate-tab" role="tab" aria-selected="true" data-mode="login">Sign in</button>
+      <button class="gate-tab" role="tab" aria-selected="false" data-mode="signup">Create account</button>
+    </div>
+
+    <form class="gate-form" id="gate-form" novalidate>
+      <div class="fld" id="fld-name" hidden>
+        <label for="f-name">Your name</label>
+        <input id="f-name" name="name" type="text" autocomplete="name" spellcheck="false">
+        <p class="fld-help">This is the name your squad sees on the roster.</p>
+      </div>
+      <div class="fld">
+        <label for="f-email">Campus email</label>
+        <input id="f-email" name="email" type="email" autocomplete="email" spellcheck="false" required>
+      </div>
+      <div class="fld">
+        <label for="f-pw">Password</label>
+        <div class="fld-pw">
+          <input id="f-pw" name="password" type="password" autocomplete="current-password" required>
+          <button type="button" class="pw-toggle" id="pw-toggle" aria-pressed="false">Show</button>
+        </div>
+        <p class="fld-help" id="pw-help" hidden>At least 8 characters.</p>
+      </div>
+      <p class="gate-error" id="gate-error" role="alert" hidden></p>
+      <button class="btn btn-primary btn-lg gate-go" id="gate-go" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+
+<!-- ============================ WORKSPACE ============================ -->
+<div class="app" id="app" hidden>
+
+  <div class="side" id="side">
+    <div class="sw-wrap">
+      <button class="sw" id="sw" aria-expanded="false" aria-haspopup="menu" aria-controls="sw-menu">
+        <span class="sw-av" id="sw-av">--</span>
+        <span class="sw-t"><span class="sw-n" id="sw-n">No squad yet</span><span class="sw-s" id="sw-s">create or join one</span></span>
+        <svg class="icon icon-sm sw-chev" aria-hidden="true"><use href="#i-chev-d"/></svg>
+      </button>
+      <div class="sw-menu" id="sw-menu" hidden role="menu" aria-label="Switch squad">
+        <div class="sw-lab">Your squads</div>
+        <div id="squad-list"></div>
+        <div class="sw-sep" role="separator"></div>
+        <button class="sw-act" id="sw-invite" role="menuitem"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-users"/></svg>Add people</button>
+        <button class="sw-act" id="new-squad" role="menuitem"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-plus"/></svg>New squad</button>
+      </div>
+    </div>
+
+    <button class="side-search" id="side-search">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#i-search"/></svg>
+      <span>Search</span><kbd id="side-kbd">&#8984;K</kbd>
+    </button>
+
+    <div class="side-wrap" id="side-wrap"><div class="side-scroll" id="side-scroll"></div></div>
+
+    <!-- focus timer: lives in the sidebar because it is the one region that
+         stays put when the compiler takes over the content area -->
+    <div class="pom" id="pom" data-phase="focus" data-state="idle">
+      <button class="pom-head" id="pom-toggle" aria-expanded="false" aria-controls="pom-body">
+        <span class="pom-ring" aria-hidden="true">
+          <svg viewBox="0 0 36 36"><circle class="pom-trk" cx="18" cy="18" r="15.5"/>
+            <circle class="pom-arc" id="pom-arc" cx="18" cy="18" r="15.5"/></svg>
+          <span class="pom-ico" id="pom-ico">⏱</span>
+        </span>
+        <span class="pom-b">
+          <span class="pom-t mono" id="pom-time">25:00</span>
+          <span class="pom-l" id="pom-label">Focus timer</span>
+        </span>
+        <svg class="icon icon-sm pom-chev" aria-hidden="true"><use href="#i-chev-d"/></svg>
+      </button>
+      <div class="pom-body" id="pom-body" hidden>
+        <div class="pom-btns">
+          <button class="btn btn-primary btn-sm" id="pom-go">Start</button>
+          <button class="btn btn-ghost btn-sm" id="pom-reset">Reset</button>
+          <button class="btn btn-ghost btn-sm" id="pom-skip" title="Jump to the next phase">Skip</button>
+        </div>
+        <div class="pom-lens">
+          <button class="pom-len" data-focus="25" data-break="5" aria-pressed="true">25 / 5</button>
+          <button class="pom-len" data-focus="50" data-break="10" aria-pressed="false">50 / 10</button>
+          <button class="pom-len" data-focus="15" data-break="3" aria-pressed="false">15 / 3</button>
+        </div>
+        <p class="pom-done mono" id="pom-done">0 sessions today</p>
+      </div>
+    </div>
+
+    <div class="me-card">
+      <button class="me-open" id="me-open" aria-label="Open your settings" title="Your account and settings">
+        <span class="av-wrap"><span class="av av-m" id="me-av">--</span><span class="presence p-on"></span></span>
+        <span class="me-meta"><span class="me-name" id="me-name">&nbsp;</span><span class="me-lvl mono" id="me-lvl">&nbsp;</span></span>
+      </button>
+      <button class="icon-btn me-gear" id="open-settings" aria-label="Settings" title="Settings">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-gear"/></svg></button>
+    </div>
+  </div>
+  <div class="scrim" id="scrim" hidden></div>
+
+  <main class="main" id="main">
+    <div class="mtop">
+      <button class="icon-btn" id="m-menu" aria-label="Open squads and channels"><svg class="icon icon-lg" aria-hidden="true"><use href="#i-menu"/></svg></button>
+      <div class="mtop-t"><div class="a" id="m-title">&nbsp;</div><div class="b" id="m-sub">&nbsp;</div></div>
+    </div>
+
+    <div class="topbar">
+      <h1 id="top-title"><span class="top-sym" id="top-sym" aria-hidden="true">#</span><span>&nbsp;</span></h1>
+      <span class="top-div" role="presentation"></span>
+      <span class="top-note" id="top-note"></span>
+      <span class="top-actions">
+        <button class="icon-btn" id="ch-search" aria-label="Search this squad" title="Search messages">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-search"/></svg></button>
+        <button class="icon-btn" id="ch-pins" aria-label="Pinned messages" title="Pinned messages">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-pin"/></svg>
+          <span class="dot-badge" id="pin-n" hidden></span></button>
+        <button class="icon-btn" id="ch-mentions" aria-label="Your mentions" title="Mentions">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-bell"/></svg>
+          <span class="dot-badge" id="mention-n" hidden></span></button>
+      </span>
+      <div class="top-right">
+        <button class="pal-open" id="pal-open" aria-label="Search everything (Command K)">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-search"/></svg><span>Search</span><kbd id="pal-kbd">&#8984;K</kbd>
+        </button>
+        <button class="icon-btn" id="ctx-toggle" aria-pressed="true" aria-controls="ctx" aria-label="Hide the squad panel"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-users"/></svg></button>
+        <div class="tabs" role="tablist" aria-label="Workspace views">
+          <button class="tab" role="tab" aria-selected="true" data-view="chat" aria-label="Chat"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-chat"/></svg><span class="tab-label" aria-hidden="true">Chat</span></button>
+          <button class="tab" role="tab" aria-selected="false" data-view="board" aria-label="Tasks"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-board"/></svg><span class="tab-label" aria-hidden="true">Tasks</span></button>
+          <button class="tab" role="tab" aria-selected="false" data-view="cal" aria-label="Calendar"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-cal"/></svg><span class="tab-label" aria-hidden="true">Calendar</span></button>
+          <button class="tab" role="tab" aria-selected="false" data-view="xp" aria-label="XP and standings"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-trophy"/></svg><span class="tab-label" aria-hidden="true">XP</span></button>
+        </div>
+      </div>
+    </div>
+
+    <section class="view" id="v-chat" aria-label="Channel messages">
+      <div class="scroll" id="chat-scroll"><div class="older" id="older" hidden><button class="btn btn-sm" id="older-btn">Load earlier messages</button></div>
+      <div class="msgs" id="msgs"></div></div>
+      <div class="composer">
+        <div class="composer-box">
+          <p class="typing mono" id="typing" hidden></p>
+          <div class="rec" id="rec" hidden>
+            <span class="rec-dot" aria-hidden="true"></span>
+            <span class="rec-time mono" id="rec-time">0:00</span>
+            <div class="rec-wave" id="rec-wave" aria-hidden="true"></div>
+            <button class="rec-x" id="rec-cancel" aria-label="Discard this recording">Discard</button>
+            <button class="rec-send" id="rec-stop" aria-label="Stop and send">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#i-send"/></svg>Send</button>
+          </div>
+          <div class="attach-tray" id="attach-tray" hidden></div>
+          <label class="sr" for="composer">Message</label>
+          <textarea class="composer-in" id="composer" rows="1" placeholder="Message"></textarea>
+          <div class="composer-bar">
+            <input type="file" id="attach-input" class="sr" multiple>
+            <button class="icon-btn" id="attach-btn" aria-label="Attach a file" title="Attach a file, picture or video"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-plus"/></svg></button>
+            <button class="icon-btn" id="voice-btn" aria-label="Record a voice message" title="Record a voice message"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-mic"/></svg></button>
+            <button class="icon-btn" id="start-meeting" aria-label="Start a meeting" title="Start a meeting"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-users"/></svg></button>
+            <span class="spacer"></span>
+            <button class="send" id="send" aria-label="Send message"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-send"/></svg></button>
+          </div>
+        </div>
+        <div class="composer-hint">Enter to send &middot; Shift+Enter for a new line</div>
+      </div>
+    </section>
+
+    <section class="view" id="v-board" aria-label="Task board" hidden>
+      <div class="board-bar">
+        <button class="fchip" aria-pressed="true" data-filter="all">All tasks</button>
+        <button class="fchip" aria-pressed="false" data-filter="mine">Assigned to me</button>
+        <button class="fchip" aria-pressed="false" data-filter="private">Private</button>
+        <span style="flex:1"></span>
+        <button class="btn btn-sm" id="add-task"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-plus"/></svg>New task</button>
+      </div>
+      <div class="board" id="board"></div>
+    </section>
+
+    <section class="view" id="v-dm" aria-label="Direct messages" hidden>
+      <div class="dm-head" id="dm-head"></div>
+      <div class="dm-scroll" id="dm-scroll">
+        <div class="older" id="dm-older" hidden><button class="btn btn-sm" id="dm-older-btn">Load earlier</button></div>
+        <div class="msgs" id="dm-msgs"></div>
+      </div>
+      <div class="composer">
+        <div class="composer-box">
+          <div class="attach-tray" id="dm-tray" hidden></div>
+          <label class="sr" for="dm-in">Message</label>
+          <textarea class="composer-in" id="dm-in" rows="1" placeholder="Message"></textarea>
+          <div class="composer-bar">
+            <input type="file" id="dm-file-input" class="sr" multiple>
+            <button class="icon-btn" id="dm-file-btn" aria-label="Attach a file" title="Attach a file, picture or video"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-plus"/></svg></button>
+            <button class="icon-btn" id="dm-attach" aria-label="Attach the whiteboard" title="Send the current whiteboard page">
+              <svg class="icon icon-sm" aria-hidden="true"><use href="#i-move"/></svg></button>
+            <span class="spacer"></span>
+            <button class="send" id="dm-send" aria-label="Send"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-send"/></svg></button>
+          </div>
+        </div>
+        <p class="composer-hint mono">Enter to send · Shift+Enter for a new line</p>
+      </div>
+    </section>
+
+    <section class="view" id="v-draw" aria-label="Whiteboard" hidden>
+      <div class="draw-pages" id="draw-pages"></div>
+      <div class="draw-bar">
+        <span class="draw-tools" id="draw-tools" role="toolbar" aria-label="Drawing tools">
+          <button class="tool" data-tool="pen" aria-pressed="true" title="Freehand (P)">✎</button>
+          <button class="tool" data-tool="line" aria-pressed="false" title="Line (L)">╱</button>
+          <button class="tool" data-tool="arrow" aria-pressed="false" title="Arrow (A)">→</button>
+          <button class="tool" data-tool="rect" aria-pressed="false" title="Rectangle (R)">▭</button>
+          <button class="tool" data-tool="ellipse" aria-pressed="false" title="Ellipse (O)">◯</button>
+          <button class="tool" data-tool="text" aria-pressed="false" title="Text (T)">T</button>
+        </span>
+        <span class="draw-colours" id="draw-colours"></span>
+        <label class="draw-w">Width
+          <input type="range" id="draw-width" min="1" max="18" value="3" aria-label="Pen width"></label>
+        <label class="draw-fill"><input type="checkbox" id="draw-fill"> Fill</label>
+        <span class="draw-text-opts" id="draw-text-opts" hidden>
+          <select id="draw-font" aria-label="Font">
+            <option value="sans">Sans</option><option value="serif">Serif</option><option value="mono">Mono</option>
+          </select>
+          <select id="draw-size" aria-label="Text size">
+            <option value="18">18</option><option value="24">24</option>
+            <option value="32" selected>32</option><option value="48">48</option>
+            <option value="64">64</option><option value="96">96</option>
+          </select>
+        </span>
+        <button class="btn btn-sm" id="draw-undo">Undo</button>
+        <button class="btn btn-sm" id="draw-clear">Clear</button>
+        <button class="btn btn-sm" id="draw-save">Save PNG</button>
+        <button class="btn btn-primary btn-sm" id="draw-send">Send…</button>
+        <span class="draw-note mono" id="draw-note"></span>
+      </div>
+      <div class="draw-wrap" id="draw-wrap">
+        <canvas id="draw-canvas"></canvas>
+        <textarea class="draw-typing" id="draw-typing" rows="1" spellcheck="false" hidden
+          aria-label="Type a label"></textarea>
+      </div>
+    </section>
+
+    <section class="view" id="v-cal" aria-label="Calendar" hidden>
+      <div class="scroll"><div class="cal-wrap">
+        <div class="panel cal-main">
+          <div class="panel-h"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-cal"/></svg><h3 id="cal-month"></h3>
+            <button class="btn btn-sm" id="cal-prev" aria-label="Previous month" style="margin-left:auto">&#8592;</button>
+            <button class="btn btn-sm" id="cal-next" aria-label="Next month">&#8594;</button></div>
+          <div class="cal-legend">
+            <span class="lk"><i class="d-task"></i>Task due</span><span class="lk"><i class="d-contest"></i>Contest</span>
+            <span class="lk"><i class="d-deadline"></i>Deadline</span><span class="lk"><i class="d-event"></i>Meeting</span>
+          </div>
+          <div class="cgrid" id="cgrid" role="grid"></div>
+        </div>
+        <div class="panel cal-side">
+          <div class="panel-h"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-clock"/></svg><h3 id="agenda-title">Pick a day</h3></div>
+          <div class="agenda" id="agenda"></div>
+          <div class="cal-foot"><button class="btn btn-primary btn-sm" id="schedule-meeting" style="width:100%;justify-content:center"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-users"/></svg>Schedule a meeting</button>
+            <button class="btn btn-sm" id="import-schedule" style="width:100%;justify-content:center;margin-top:6px"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-cal"/></svg>Import a contest schedule</button></div>
+        </div>
+      </div></div>
+    </section>
+
+    <section class="view" id="v-xp" aria-label="Experience and standings" hidden>
+      <div class="scroll"><div class="xp-wrap">
+        <div class="panel g8"><div class="lvl">
+          <div class="ring"><svg viewBox="0 0 120 120" width="120" height="120" role="img" id="ring-svg" aria-label="Level progress">
+            <circle cx="60" cy="60" r="52" fill="none" stroke="#232838" stroke-width="9"/>
+            <circle id="ring-arc" cx="60" cy="60" r="52" fill="none" stroke="#E9B949" stroke-width="9" stroke-linecap="round" stroke-dasharray="326.7" stroke-dashoffset="326.7"/>
+          </svg><div class="ring-mid"><span class="ring-n mono" id="ring-n">1</span><span class="ring-l">Level</span></div></div>
+          <div class="lvl-meta"><h2 id="xp-name">&nbsp;</h2>
+            <div class="xp-line"><b id="xp-total">0</b> XP &middot; <span id="xp-togo">0</span> to the next level</div>
+            <div class="bar"><div class="bar-f" id="xp-bar" style="width:0%"></div></div>
+          </div>
+        </div></div>
+        <div class="panel g4"><div class="panel-h"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-zap"/></svg><h3>XP ledger</h3></div><div class="ledger" id="ledger"></div></div>
+        <div class="panel g12"><div class="panel-h"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-trophy"/></svg><h3>Campus standings</h3></div>
+          <div class="tbl-scroll"><table class="lb"><thead><tr><th scope="col">#</th><th scope="col">Member</th><th scope="col" class="num">XP</th></tr></thead><tbody id="lb-body"></tbody></table></div>
+        </div>
+      </div></div>
+    </section>
+  </main>
+
+  <aside class="ctx" id="ctx" aria-label="Squad details">
+    <div class="ctx-h"><svg class="icon icon-sm" aria-hidden="true"><use href="#i-users"/></svg><h3>Squad</h3></div>
+    <div class="ctx-body" id="ctx-body"></div>
+  </aside>
+
+  <!-- ---------------------------- THREAD ---------------------------- -->
+  <aside class="thread" id="thread" hidden aria-label="Thread">
+    <div class="thread-top"><span class="eyebrow">Thread</span>
+      <button class="icon-btn" id="thread-x" aria-label="Close thread">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+    <div class="thread-body" id="thread-body"></div>
+    <div class="thread-foot">
+      <textarea class="composer-in" id="thread-in" rows="1" placeholder="Reply in thread"></textarea>
+      <button class="send" id="thread-send" aria-label="Send reply">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-send"/></svg></button>
+    </div>
+  </aside>
+
+  <!-- ---------------------------- COMPILER ---------------------------- -->
+  <aside class="code" id="code" aria-label="Compiler" hidden>
+    <div class="code-top">
+      <div class="code-scopes" role="tablist" aria-label="Whose files">
+        <button class="code-scope" role="tab" data-scope="personal" aria-selected="true">Personal</button>
+        <button class="code-scope" role="tab" data-scope="team" aria-selected="false">Team</button>
+      </div>
+      <button class="icon-btn" id="code-close" aria-label="Close the compiler">
+        <svg class="icon icon-sm" aria-hidden="true"><use href="#i-x"/></svg></button>
+    </div>
+
+    <div class="code-files" id="code-files"></div>
+
+    <div class="code-body" id="code-body">
+      <div class="code-bar">
+        <input class="code-title" id="code-title" maxlength="80" placeholder="untitled" aria-label="File name">
+        <select class="code-lang" id="code-lang" aria-label="Language"></select>
+        <span class="code-saved mono" id="code-saved"></span>
+      </div>
+
+      <div class="code-editor">
+        <div class="code-gutter" id="code-gutter" aria-hidden="true"></div>
+        <div class="code-stack">
+          <pre class="code-hl" id="code-hl" aria-hidden="true"></pre>
+          <textarea class="code-area" id="code-area" spellcheck="false" autocomplete="off"
+            autocapitalize="off" autocorrect="off" wrap="off" aria-label="Source code"
+            aria-autocomplete="list" aria-controls="code-ac"></textarea>
+        </div>
+        <div class="code-ac" id="code-ac" role="listbox" aria-label="Completions" hidden></div>
+      </div>
+
+      <div class="code-run">
+        <button class="btn btn-primary btn-sm" id="code-go">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-play"/></svg>Run</button>
+        <button class="btn btn-ghost btn-sm" id="code-test">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-check"/></svg>Run tests<span id="code-test-n"></span></button>
+        <button class="btn btn-ghost btn-sm" id="code-copy">Copy code</button>
+        <button class="btn btn-ghost btn-sm" id="code-share">Share…</button>
+        <button class="btn btn-ghost btn-sm" id="code-lib" hidden>Library…</button>
+        <button class="btn btn-ghost btn-sm" id="code-del" aria-label="Delete this file">Delete</button>
+      </div>
+
+      <details class="code-stdin"><summary>Input (stdin)</summary>
+        <textarea id="code-in" rows="3" spellcheck="false" placeholder="Typed here, fed to the program"
+          aria-label="Standard input"></textarea></details>
+
+      <details class="code-cases" id="code-cases"><summary>Test cases <span class="mono" id="cases-sum"></span></summary>
+        <div class="cases-list" id="cases-list"></div>
+        <button class="btn btn-sm" id="case-add">+ Add a case</button></details>
+
+      <div class="code-split" id="code-split" role="separator" tabindex="0"
+        aria-orientation="horizontal" aria-label="Resize the output pane"
+        aria-valuemin="12" aria-valuemax="70" aria-valuenow="38"
+        title="Drag to resize · arrow keys also work · double-click to reset"><span></span></div>
+
+      <div class="code-out-h"><span class="eyebrow">Output</span>
+        <span class="code-meta mono" id="code-meta"></span>
+        <button class="code-mini" id="code-copyout">Copy</button></div>
+      <pre class="code-out" id="code-out" tabindex="0"></pre>
+    </div>
+
+    <div class="code-empty" id="code-empty">
+      <h3>No file open</h3>
+      <p>Make one to start writing C++ or Python. <b>Personal</b> files are yours alone —
+         <b>Team</b> files are visible to everyone in the squad.</p>
+      <button class="btn btn-primary btn-sm" data-new-snip>New file</button>
+    </div>
+  </aside>
+</div>
+
+<!-- =========================== SETTINGS =========================== -->
+<div class="set-scrim" id="set-scrim" hidden></div>
+<aside class="set" id="set" role="dialog" aria-modal="true" aria-labelledby="set-h" hidden>
+  <div class="set-top">
+    <h2 id="set-h">Settings</h2>
+    <button class="icon-btn" id="set-x" aria-label="Close settings">
+      <svg class="icon icon-sm" aria-hidden="true"><use href="#i-x"/></svg></button>
+  </div>
+  <nav class="set-tabs" role="tablist" aria-label="Settings sections">
+    <button class="set-tab" role="tab" data-set="profile" aria-selected="true">Profile</button>
+    <button class="set-tab" role="tab" data-set="security" aria-selected="false">Security</button>
+    <button class="set-tab" role="tab" data-set="account" aria-selected="false">Account</button>
+  </nav>
+  <div class="set-body" id="set-body"></div>
+</aside>
+
+<!-- ============================= TOUR ============================= -->
+<div class="tour-ask-scrim" id="tour-ask-scrim" hidden></div>
+<div class="tour-ask" id="tour-ask" role="dialog" aria-modal="true" aria-labelledby="tour-ask-t" hidden>
+  <span class="auth-g tour-ask-ic" style="background:var(--gold-wash);color:var(--gold)"><svg class="icon" aria-hidden="true"><use href="#i-compass"/></svg></span>
+  <h2 id="tour-ask-t">First time in Squadron?</h2>
+  <p>A short walk through the workspace — each stop points at the thing it is describing. You can leave at any time.</p>
+  <div class="tour-ask-row">
+    <button class="btn btn-primary" id="tour-yes">Show me around</button>
+    <button class="btn" id="tour-no">Skip, I'll explore</button>
+  </div>
+</div>
+
+<!-- ============================ MEETING ============================ -->
+<div class="meet" id="meet" hidden role="dialog" aria-modal="true" aria-label="Meeting">
+  <div class="meet-top">
+    <span class="meet-badge"><span class="meet-dot"></span><span id="meet-title">Meeting</span></span>
+    <button class="meet-count mono" id="meet-count" aria-expanded="false"
+      aria-controls="meet-who" title="Who is in the room">1 in the room</button>
+    <button class="btn btn-sm" id="meet-copy">Copy invite link</button>
+  </div>
+  <div class="meet-warn" id="meet-warn" role="status" hidden></div>
+  <div class="meet-stage">
+    <div class="meet-grid" id="meet-grid"></div>
+    <aside class="meet-who" id="meet-who" hidden aria-label="People in this meeting">
+      <div class="meet-who-h"><span class="eyebrow">In the room</span>
+        <button class="icon-btn" id="meet-who-x" aria-label="Hide the list">
+          <svg class="icon icon-sm" aria-hidden="true"><use href="#i-x"/></svg></button></div>
+      <div class="meet-who-list" id="meet-who-list"></div>
+    </aside>
+  </div>
+  <div class="meet-bar">
+    <button class="meet-btn" id="meet-mic" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-mic"/></svg><span>Mute</span></button>
+    <button class="meet-btn" id="meet-cam" aria-pressed="true"><svg class="icon" aria-hidden="true"><use href="#i-users"/></svg><span>Camera</span></button>
+    <button class="meet-btn" id="meet-share" aria-pressed="false"><svg class="icon" aria-hidden="true"><use href="#i-board"/></svg><span>Share screen</span></button>
+    <button class="meet-btn danger" id="meet-leave"><svg class="icon" aria-hidden="true"><use href="#i-x"/></svg><span>Leave</span></button>
+  </div>
+</div>
+
+<div class="soon" id="soon" hidden role="status" aria-live="polite"></div>
+<div class="toasts" id="toasts"></div>
+<div class="modal-scrim" id="modal-scrim" hidden></div>
+<div class="modal" id="modal" hidden role="dialog" aria-modal="true"></div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.13.0/ScrollTrigger.min.js"></script>
+<script type="module" src="/app.js"></script>
+<script defer src="/landing.js"></script>
+</body>
+</html>

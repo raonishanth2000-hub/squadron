@@ -1,0 +1,20 @@
+{
+  "name": "squadron",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Workspace for CS squads \u2014 channels, tasks, XP, calendar and meetings",
+  "scripts": {
+    "dev": "node --watch server/index.js",
+    "start": "node server/index.js",
+    "dev:http": "SQUADRON_HTTP=1 node --watch server/index.js",
+    "tunnel": "sh scripts/tunnel.sh",
+    "deploy": "sh scripts/deploy.sh"
+  },
+  "dependencies": {
+    "ws": "^8.18.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}

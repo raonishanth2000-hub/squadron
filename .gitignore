@@ -1,0 +1,17 @@
+# Live data — never commit. squadron.db holds real accounts, password hashes,
+# messages and DMs; files/ holds whatever people have uploaded; the pem files
+# are a private TLS key for local development.
+data/
+
+# Scratch space: logs, probes, and database backups
+.tmp/
+
+node_modules/
+npm-debug.log*
+
+.DS_Store
+.vscode/
+.idea/
+
+# local agent config
+.claude/

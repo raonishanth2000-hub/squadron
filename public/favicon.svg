@@ -1,0 +1,14 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" role="img" aria-label="Squadron">
+  <!-- Squadron's mark: the balloon a team gets for a solved problem, which is
+       what the whole product is pointed at. Same gold and same silhouette as
+       the glyph in the app header, so the tab and the page agree.
+
+       Drawn as fills rather than the app's 2px strokes: at the 16px a browser
+       tab actually renders, a hairline stroke turns to grey mush. The knot
+       detail from the in-app icon is dropped for the same reason. -->
+  <rect width="32" height="32" rx="8" fill="#E9B949"/>
+  <g transform="translate(3.7 2.4) scale(1.05)">
+    <path d="M12 2a6 6 0 0 1 6 6c0 4-3.5 7.5-6 8.5C9.5 15.5 6 12 6 8a6 6 0 0 1 6-6z" fill="#1A1204"/>
+    <path d="M12 17.1v4.7" stroke="#1A1204" stroke-width="2.5" stroke-linecap="round"/>
+  </g>
+</svg>
