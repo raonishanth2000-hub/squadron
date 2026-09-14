@@ -2772,9 +2772,22 @@ function setSplit(pct, remember = true) {
    expects when a program stops and asks them something. */
 const liveRow = () => $('#code-live-row');
 
-function liveAppend(text) {
+/* `kind` is 'in' for a line the person typed. It matters more than it looks:
+   stdin is a pipe, so nothing echoes it, and the copy we paint here used to be
+   indistinguishable from what the program printed. Feed `input()` a 12 and the
+   console read `12` twice — once because you typed it, once because the program
+   printed it — which reads as a bug rather than as a terminal. Typed lines are
+   now marked, so the two are never mistaken for each other. */
+function liveAppend(text, kind) {
   const out = $('#code-out');
-  out.textContent += text;
+  if (kind === 'in') {
+    const s = document.createElement('span');
+    s.className = 'co-in';
+    s.textContent = text;
+    out.appendChild(s);
+  } else {
+    out.appendChild(document.createTextNode(text));
+  }
   out.scrollTop = out.scrollHeight;
 }
 /* The stop control lives on the Run button as well as beside the input line.
@@ -2801,7 +2814,8 @@ function liveStop(quiet) {
 $('#code-live-stop').onclick = () => { liveStop(); liveAppend('\n— stopped\n'); $('#code-meta').textContent = 'stopped'; };
 function sendLine(line) {
   /* a pipe does not echo, so the line is shown here or it vanishes */
-  liveAppend(line + '\n');
+  liveAppend(line, 'in');
+  liveAppend('\n');
   safeSend({ type: 'code-stdin', line });
 }
 $('#code-live-in').addEventListener('keydown', (e) => {
@@ -4609,7 +4623,7 @@ const CODE_TOUR = [
   { sel: '#code-go', inCode: true, side: 'top', k: 'Run',
     t: 'Compile and run', b: 'The program runs in a sandbox with no network access and a few seconds of CPU, so an infinite loop stops itself rather than taking the server with it.' },
   { sel: '#code-out', inCode: true, side: 'top', k: 'Output',
-    t: 'Output, and where you answer', b: 'The program prints here as it goes. When it asks a question a line opens underneath — type the answer and press Enter, or paste a whole case and every line is fed in order. A crash is explained in words rather than left as a bare number.' },
+    t: 'Output, and where you answer', b: 'The program prints here as it goes. When it asks a question a line opens underneath — type the answer and press Enter, or paste a whole case and every line is fed in order. Your answer is echoed here <b class="co-in-eg">in gold</b>, the way a terminal shows it — so a program that reads a number and then prints it shows that number twice: once because you typed it, once because it printed it. A crash is explained in words rather than left as a bare number.' },
   { sel: '#code-split', inCode: true, side: 'top', k: 'Layout',
     t: 'Drag to resize', b: 'Pull this bar to give more room to the editor or to the output. Arrow keys work too, and a double-click puts it back.' }
 ];

@@ -1684,6 +1684,15 @@ body.gate-open .lp{filter:saturate(.7);}
 .code-out[data-state="bad"]{border-color:rgba(232,109,116,.42);color:#F3B9BC;}
 .code-out[data-state="wait"]{color:var(--text-3);}
 
+/* A line the person typed, echoed into the console. Two channels, not one:
+   colour *and* a tinted block, so it never depends on telling gold from grey.
+   It matches the gold caret on the input row below — same colour, same origin.
+   Written after the [data-state] rules so it survives a failed run repainting
+   the console red. */
+.code-out .co-in{color:var(--gold);background:rgba(233,185,73,.1);
+  border-radius:3px;padding:0 3px;margin:0 -1px;}
+.co-in-eg{color:var(--gold);font-family:var(--f-mono);font-weight:600;}
+
 .code-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
   gap:11px;padding:var(--s5);text-align:center;}
 .code-empty h3{margin:0;font-size:16px;font-weight:700;}
