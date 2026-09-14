@@ -1691,6 +1691,11 @@ body.gate-open .lp{filter:saturate(.7);}
    the console red. */
 .code-out .co-in{color:var(--gold);background:rgba(233,185,73,.1);
   border-radius:3px;padding:0 3px;margin:0 -1px;}
+/* said in words, not left to colour: three channels — the label, the gold, the
+   tint — so nobody has to work out which of two identical numbers was theirs.
+   Generated content, so the Copy button still yields what the program saw. */
+.code-out .co-in::before{content:'your input: ';color:var(--text-2);font-weight:500;}
+.code-out .co-in[data-blank]::after{content:'(blank line)';color:var(--text-3);font-style:italic;}
 .co-in-eg{color:var(--gold);font-family:var(--f-mono);font-weight:600;}
 
 .code-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;

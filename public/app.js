@@ -2783,7 +2783,11 @@ function liveAppend(text, kind) {
   if (kind === 'in') {
     const s = document.createElement('span');
     s.className = 'co-in';
+    /* the "your input:" label is drawn by CSS, not written into the node, so
+       Copy still hands over the output a terminal would have given — the label
+       is there to be read, not to be pasted into a bug report */
     s.textContent = text;
+    if (!text) s.dataset.blank = '1';
     out.appendChild(s);
   } else {
     out.appendChild(document.createTextNode(text));
@@ -2813,6 +2817,11 @@ function liveStop(quiet) {
 }
 $('#code-live-stop').onclick = () => { liveStop(); liveAppend('\n— stopped\n'); $('#code-meta').textContent = 'stopped'; };
 function sendLine(line) {
+  const out = $('#code-out');
+  /* input("Enter your digit") leaves the cursor mid-line, so the echo used to
+     land against the prompt and read as one word: "Enter your digit12". Your
+     answer gets its own line, whether or not the prompt ended in one. */
+  if (out.textContent && !out.textContent.endsWith('\n')) liveAppend('\n');
   /* a pipe does not echo, so the line is shown here or it vanishes */
   liveAppend(line, 'in');
   liveAppend('\n');
@@ -4623,7 +4632,7 @@ const CODE_TOUR = [
   { sel: '#code-go', inCode: true, side: 'top', k: 'Run',
     t: 'Compile and run', b: 'The program runs in a sandbox with no network access and a few seconds of CPU, so an infinite loop stops itself rather than taking the server with it.' },
   { sel: '#code-out', inCode: true, side: 'top', k: 'Output',
-    t: 'Output, and where you answer', b: 'The program prints here as it goes. When it asks a question a line opens underneath — type the answer and press Enter, or paste a whole case and every line is fed in order. Your answer is echoed here <b class="co-in-eg">in gold</b>, the way a terminal shows it — so a program that reads a number and then prints it shows that number twice: once because you typed it, once because it printed it. A crash is explained in words rather than left as a bare number.' },
+    t: 'Output, and where you answer', b: 'The program prints here as it goes. When it asks a question a line opens underneath — type the answer and press Enter, or paste a whole case and every line is fed in order. Your answer is echoed back on its own line, labelled <b class="co-in-eg">your input</b> — so a program that reads a number and then prints it shows that number twice: once because you typed it, once because it printed it. A crash is explained in words rather than left as a bare number.' },
   { sel: '#code-split', inCode: true, side: 'top', k: 'Layout',
     t: 'Drag to resize', b: 'Pull this bar to give more room to the editor or to the output. Arrow keys work too, and a double-click puts it back.' }
 ];
