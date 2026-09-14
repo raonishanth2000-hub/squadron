@@ -1671,7 +1671,11 @@ body.gate-open .lp{filter:saturate(.7);}
 /* output holds a third of the panel: enough for a stack trace without
    pushing the editor into a slot */
 /* the height the splitter drives; 38% is only where it starts */
-.code-out{flex:0 0 var(--out-h,38%);min-height:70px;overflow:auto;margin:0;
+/* `0 1` not `0 0`: the basis is what the splitter sets, but the box must still
+   be allowed to give ground. With `0 0` it refused to shrink, the column
+   overflowed, and the line you type into was pushed off the bottom of the
+   compiler where nobody could see it. */
+.code-out{flex:0 1 var(--out-h,38%);min-height:70px;overflow:auto;margin:0;
   transition:flex-basis .22s ease;
   background:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:9px 11px;
   font-family:var(--f-mono);font-size:12px;line-height:1.6;white-space:pre-wrap;
@@ -2328,8 +2332,12 @@ body.has-cur #draw-canvas{cursor:none;}
   background:var(--azure-wash);color:var(--azure);vertical-align:middle;}
 
 
+/* Run wearing its Stop face */
+#code-go.is-stop{background:var(--danger);border-color:var(--danger);color:#190607;}
+#code-go.is-stop:hover{background:#F0716B;}
+
 /* the console line for an interactive run */
-.code-live-row{flex:none;display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;
+.code-live-row{flex:0 0 auto;display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;
   border:1px solid var(--gold-dim);border-radius:var(--r-sm);background:var(--ink);}
 .code-live-caret{color:var(--gold);font-size:15px;line-height:1;}
 .code-live-in{flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--text);

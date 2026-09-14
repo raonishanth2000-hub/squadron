@@ -2586,6 +2586,7 @@ async function newSnippet() {
 }
 
 async function runSnippet() {
+  if (C.running) { liveStop(); liveAppend('\n— stopped\n'); $('#code-meta').textContent = 'stopped'; return; }
   /* C.running guards the interactive path, C.busy the batch one — and the live
      branch must be taken before C.busy is set, because only the batch path has
      the finally that clears it. Setting it first left C.busy stuck true after
@@ -2776,6 +2777,16 @@ function liveAppend(text) {
   out.textContent += text;
   out.scrollTop = out.scrollHeight;
 }
+/* The stop control lives on the Run button as well as beside the input line.
+   One of the two is always where the eye already is. */
+function paintRunButton() {
+  const b = $('#code-go');
+  $('#code-go-t').textContent = C.running ? 'Stop' : 'Run';
+  $('#code-go-ic').innerHTML = `<use href="#${C.running ? 'i-x' : 'i-play'}"/>`;
+  b.classList.toggle('btn-primary', !C.running);
+  b.classList.toggle('is-stop', !!C.running);
+  b.setAttribute('aria-label', C.running ? 'Stop the running program' : 'Run');
+}
 function liveStop(quiet) {
   if (!C.running) return;
   C.running = false;
@@ -2784,6 +2795,7 @@ function liveStop(quiet) {
   restoreConsole();
   $('#code-go').disabled = false;
   delete $('#code-go').dataset.busy;
+  paintRunButton();
   if (!quiet) safeSend({ type: 'code-kill' });
 }
 $('#code-live-stop').onclick = () => { liveStop(); liveAppend('\n— stopped\n'); $('#code-meta').textContent = 'stopped'; };
@@ -2835,8 +2847,7 @@ function restoreConsole() {
 async function runLive() {
   if (!S.squad) return toast('Join a squad first', 'Running code is scoped to a squad.');
   C.running = true;
-  const go = $('#code-go');
-  go.disabled = true; go.dataset.busy = '1';
+  paintRunButton();
   $('#code-out').textContent = '';
   $('#code-out').dataset.state = 'wait';
   $('#code-meta').textContent = 'running…';
