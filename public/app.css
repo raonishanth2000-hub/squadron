@@ -1651,12 +1651,6 @@ body.gate-open .lp{filter:saturate(.7);}
 #code-go[data-busy="1"]{opacity:.6;}
 #code-del{margin-left:auto;color:var(--danger);}
 
-.code-stdin{flex:none;}
-.code-stdin summary{font-size:11.5px;color:var(--text-3);padding:3px 0;}
-.code-stdin textarea{width:100%;margin-top:5px;background:var(--ink);border:1px solid var(--line);
-  border-radius:var(--r-sm);padding:7px 9px;color:var(--text);resize:vertical;
-  font-family:var(--f-mono);font-size:12px;line-height:1.55;}
-.code-stdin textarea:focus{border-color:var(--azure-dim);outline:none;}
 
 /* Grab bar between the editor and the output. Kept thin, with a much taller
    invisible hit area, because a 4px target is a fight on a trackpad. */
@@ -1678,6 +1672,7 @@ body.gate-open .lp{filter:saturate(.7);}
    pushing the editor into a slot */
 /* the height the splitter drives; 38% is only where it starts */
 .code-out{flex:0 0 var(--out-h,38%);min-height:70px;overflow:auto;margin:0;
+  transition:flex-basis .22s ease;
   background:var(--ink);border:1px solid var(--line);border-radius:var(--r-md);padding:9px 11px;
   font-family:var(--f-mono);font-size:12px;line-height:1.6;white-space:pre-wrap;
   overflow-wrap:anywhere;color:var(--text-2);}
@@ -2332,7 +2327,6 @@ body.has-cur #draw-canvas{cursor:none;}
   font-family:var(--f-mono);font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
   background:var(--azure-wash);color:var(--azure);vertical-align:middle;}
 
-.code-stdin-h{color:var(--text-3);font-size:11px;font-weight:400;}
 
 /* the console line for an interactive run */
 .code-live-row{flex:none;display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;
@@ -2343,11 +2337,6 @@ body.has-cur #draw-canvas{cursor:none;}
 .code-live-in::placeholder{color:var(--text-3);}
 
 /* the input box, when a run just died for want of it */
-.code-stdin.want-input > summary{color:var(--gold);}
-.code-stdin.want-input{outline:2px solid var(--gold-dim);outline-offset:3px;border-radius:var(--r-sm);
-  animation:wantInput 1.3s ease 2;}
-@keyframes wantInput{50%{outline-color:var(--gold);}}
-@media (prefers-reduced-motion:reduce){ .code-stdin.want-input{animation:none;} }
 
 /* ---------- private tasks ---------- */
 /* A dashed edge says "not on the shared board" at a glance, without the card

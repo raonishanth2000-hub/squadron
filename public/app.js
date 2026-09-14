@@ -2506,7 +2506,6 @@ function renderSnippets() {
   $('#code-title').value = C.cur.title;
   $('#code-lang').value = C.cur.lang;
   $('#code-area').value = C.cur.body;
-  $('#code-in').value = C.cur.stdin;
   $('#code-del').hidden = !canDelete(C.cur);
   paintGutter(); paintCode(); hideAC();
   $('#code-lib').hidden = C.cur.scope !== 'team';
@@ -2541,7 +2540,7 @@ async function flushSnippet() {
   const id = C.cur.id;
   const payload = {
     title: $('#code-title').value, lang: $('#code-lang').value,
-    body: $('#code-area').value, stdin: $('#code-in').value
+    body: $('#code-area').value
   };
   C.dirty = false;
   try {
@@ -2593,11 +2592,11 @@ async function runSnippet() {
      the first interactive run, and every later Run returned here in silence. */
   if (C.busy || C.running || !C.cur) return;
   await flushSnippet();
-  /* The mode follows what you have done, not a switch you had to find.
-     Nothing in the input box means you intend to answer the program as it asks
-     — the way an IDE behaves. Something in the box means you have a prepared
-     case and want it piped in, which is what a judge does. */
-  if (!$('#code-in').value.trim() && S.ws?.readyState === 1) return runLive();
+  /* Always run live. The separate input box is gone: a program that wants
+     something now asks for it in the output, and you answer there — including
+     by pasting a whole case at once, which is what the box was for. The request
+     path below survives only as a fallback for a dropped socket. */
+  if (S.ws?.readyState === 1) return runLive();
   C.busy = true;
   const go = $('#code-go');
   go.disabled = true; go.dataset.busy = '1';
@@ -2607,24 +2606,12 @@ async function runSnippet() {
   try {
     const r = await api('POST', '/api/run', {
       squadId: S.squad.id, lang: $('#code-lang').value,
-      source: $('#code-area').value, stdin: $('#code-in').value
+      source: $('#code-area').value, stdin: ''
     });
     const parts = [];
     if (r.stdout) parts.push(r.stdout.replace(/\n$/, ''));
     if (r.stderr) parts.push(r.stderr.replace(/\n$/, ''));
 
-    /* A program that reads input and was given none dies on EOF, and the
-       traceback explains that in a way only Python programmers recognise.
-       The input box is a collapsed <details> a few pixels away, so name
-       what is missing and open it — the fix is right there. */
-    const wantedInput = /EOFError|EOF when reading/i.test(r.stderr || '');
-    if (!r.ok && wantedInput && !$('#code-in').value.trim()) {
-      parts.push('', '— This program is waiting for input, and none was given.',
-        '  Put it in the Input (stdin) box just above, then press Run again.');
-      const box = $('.code-stdin');
-      if (box) { box.open = true; box.classList.add('want-input');
-        setTimeout(() => box.classList.remove('want-input'), 2800); }
-    }
 
     $('#code-out').textContent = parts.join('\n') || '(no output)';
     $('#code-out').dataset.state = r.ok ? 'ok' : 'bad';
@@ -2794,20 +2781,56 @@ function liveStop(quiet) {
   C.running = false;
   C.busy = false;
   liveRow().hidden = true;
+  restoreConsole();
   $('#code-go').disabled = false;
   delete $('#code-go').dataset.busy;
   if (!quiet) safeSend({ type: 'code-kill' });
 }
 $('#code-live-stop').onclick = () => { liveStop(); liveAppend('\n— stopped\n'); $('#code-meta').textContent = 'stopped'; };
+function sendLine(line) {
+  /* a pipe does not echo, so the line is shown here or it vanishes */
+  liveAppend(line + '\n');
+  safeSend({ type: 'code-stdin', line });
+}
 $('#code-live-in').addEventListener('keydown', (e) => {
   if (e.key !== 'Enter') return;
   e.preventDefault();
   const line = e.target.value;
   e.target.value = '';
-  /* a pipe does not echo, so the line is shown here or it vanishes */
-  liveAppend(line + '\n');
-  safeSend({ type: 'code-stdin', line });
+  sendLine(line);
 });
+/* Pasting a whole test case has to work, or removing the old input box would
+   have taken something away: competitive problems arrive as a block of lines,
+   not as one answer at a time. Each line is fed in order, as a terminal would. */
+$('#code-live-in').addEventListener('paste', (e) => {
+  const text = e.clipboardData?.getData('text') ?? '';
+  if (!/\n/.test(text)) return;                 // a single value pastes normally
+  e.preventDefault();
+  const lines = text.replace(/\r/g, '').split('\n');
+  if (lines[lines.length - 1] === '') lines.pop();
+  const box = e.target;
+  const head = box.value;
+  box.value = '';
+  lines.forEach((l, i) => sendLine(i === 0 ? head + l : l));
+});
+
+/* While a program is asking questions the console is the part you are using, so
+   it takes the room — then gives it back, unless you moved the splitter yourself
+   in the meantime. */
+function growConsole() {
+  const body = $('#code-body');
+  const cur = parseFloat(getComputedStyle(body).getPropertyValue('--out-h')) ||
+    ($('#code-out').getBoundingClientRect().height / body.getBoundingClientRect().height * 100);
+  if (cur >= 55) return;
+  C.splitBefore = cur;
+  C.splitSet = setSplit(58, false);
+}
+function restoreConsole() {
+  if (C.splitBefore == null) return;
+  const now = parseFloat(getComputedStyle($('#code-body')).getPropertyValue('--out-h'));
+  if (C.splitSet != null && Math.abs(now - C.splitSet) < 0.6) setSplit(C.splitBefore, false);
+  C.splitBefore = C.splitSet = null;
+}
 
 async function runLive() {
   if (!S.squad) return toast('Join a squad first', 'Running code is scoped to a squad.');
@@ -2818,6 +2841,7 @@ async function runLive() {
   $('#code-out').dataset.state = 'wait';
   $('#code-meta').textContent = 'running…';
   liveRow().hidden = false;
+  growConsole();
   setTimeout(() => $('#code-live-in').focus(), 80);
   if (!(await waitForSocket(5000))) {
     liveStop(true);
@@ -2862,7 +2886,6 @@ $$('.code-scope').forEach(b => b.onclick = async () => {
 });
 $('#code-title').addEventListener('input', touchSnippet);
 $('#code-lang').addEventListener('change', () => { paintCode(); touchSnippet(); });
-$('#code-in').addEventListener('input', touchSnippet);
 $('#code-area').addEventListener('input', () => { paintCode(); paintGutter(); touchSnippet(); showAC(); });
 $('#code-area').addEventListener('scroll', syncCodeScroll);
 $('#code-area').addEventListener('blur', () => setTimeout(hideAC, 120));
@@ -4570,14 +4593,12 @@ const CODE_TOUR = [
     t: 'C++ or Python', b: 'Set this to match the code you are writing. It decides which compiler runs and how the file is highlighted — the chip on the file tab shows the current setting.' },
   { sel: '.code-editor', inCode: true, side: 'bottom', k: 'Editor',
     t: 'Write it here', b: 'Saves as you type, so there is nothing to press. <b>Tab</b> indents, and the squad sees changes to a Team file straight away.' },
-  { sel: '.code-stdin', inCode: true, side: 'top', k: 'Input',
-    t: 'Two ways to answer a program', b: '<b>Leave this empty</b> and the program runs live — it prints its question, and you type the answer under the output, the way an editor does. <b>Put text here</b> and it is piped in instead, one value per line, the way a judge feeds a solution.' },
+  { sel: '#code-cases', inCode: true, side: 'top', k: 'Test cases',
+    t: 'Many inputs at once', b: 'Save an input and the answer you expect, then <b>Run tests</b> checks them all in one go — the fastest way to know a solution holds.' },
   { sel: '#code-go', inCode: true, side: 'top', k: 'Run',
     t: 'Compile and run', b: 'The program runs in a sandbox with no network access and a few seconds of CPU, so an infinite loop stops itself rather than taking the server with it.' },
   { sel: '#code-out', inCode: true, side: 'top', k: 'Output',
-    t: 'What it printed', b: 'Anything the program wrote, plus the exit code and how long it took. When it is waiting on you, a line appears underneath to type into. A crash is explained in words rather than left as a bare number.' },
-  { sel: '#code-cases', inCode: true, side: 'top', k: 'Test cases',
-    t: 'Many inputs at once', b: 'Save input and the answer you expect, then <b>Run tests</b> checks them all in one go — faster than pasting inputs one at a time.' },
+    t: 'Output, and where you answer', b: 'The program prints here as it goes. When it asks a question a line opens underneath — type the answer and press Enter, or paste a whole case and every line is fed in order. A crash is explained in words rather than left as a bare number.' },
   { sel: '#code-split', inCode: true, side: 'top', k: 'Layout',
     t: 'Drag to resize', b: 'Pull this bar to give more room to the editor or to the output. Arrow keys work too, and a double-click puts it back.' }
 ];
