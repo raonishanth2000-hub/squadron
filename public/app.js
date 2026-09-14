@@ -2593,7 +2593,11 @@ async function runSnippet() {
      the first interactive run, and every later Run returned here in silence. */
   if (C.busy || C.running || !C.cur) return;
   await flushSnippet();
-  if (C.live) return runLive();
+  /* The mode follows what you have done, not a switch you had to find.
+     Nothing in the input box means you intend to answer the program as it asks
+     — the way an IDE behaves. Something in the box means you have a prepared
+     case and want it piped in, which is what a judge does. */
+  if (!$('#code-in').value.trim() && S.ws?.readyState === 1) return runLive();
   C.busy = true;
   const go = $('#code-go');
   go.disabled = true; go.dataset.busy = '1';
@@ -2778,21 +2782,7 @@ function setSplit(pct, remember = true) {
    alive over the socket: output arrives as it is printed, and a typed line goes
    back the way it would at a terminal. Which is what anyone who has used an IDE
    expects when a program stops and asks them something. */
-try { C.live = localStorage.getItem('sq.live') === '1'; } catch {}
 const liveRow = () => $('#code-live-row');
-
-function paintLiveToggle() {
-  $('#code-live').setAttribute('aria-pressed', String(!!C.live));
-}
-$('#code-live').onclick = () => {
-  C.live = !C.live;
-  try { localStorage.setItem('sq.live', C.live ? '1' : '0'); } catch {}
-  paintLiveToggle();
-  toast(C.live ? 'Interactive run is on' : 'Interactive run is off',
-    C.live ? 'Run, then type answers underneath as the program asks for them.'
-           : 'Run uses whatever is in the Input (stdin) box.', 'ok');
-};
-paintLiveToggle();
 
 function liveAppend(text) {
   const out = $('#code-out');
@@ -4581,11 +4571,11 @@ const CODE_TOUR = [
   { sel: '.code-editor', inCode: true, side: 'bottom', k: 'Editor',
     t: 'Write it here', b: 'Saves as you type, so there is nothing to press. <b>Tab</b> indents, and the squad sees changes to a Team file straight away.' },
   { sel: '.code-stdin', inCode: true, side: 'top', k: 'Input',
-    t: 'This is where input goes', b: 'If your program calls <b>input()</b> or reads <b>cin</b>, put what it should read here — one value per line, exactly as a judge would feed it. Leave it empty and the program hits end-of-file and stops.' },
+    t: 'Two ways to answer a program', b: '<b>Leave this empty</b> and the program runs live — it prints its question, and you type the answer under the output, the way an editor does. <b>Put text here</b> and it is piped in instead, one value per line, the way a judge feeds a solution.' },
   { sel: '#code-go', inCode: true, side: 'top', k: 'Run',
     t: 'Compile and run', b: 'The program runs in a sandbox with no network access and a few seconds of CPU, so an infinite loop stops itself rather than taking the server with it.' },
   { sel: '#code-out', inCode: true, side: 'top', k: 'Output',
-    t: 'What it printed', b: 'Anything the program wrote, plus the exit code and how long it took. A crash is explained in words rather than left as a bare number.' },
+    t: 'What it printed', b: 'Anything the program wrote, plus the exit code and how long it took. When it is waiting on you, a line appears underneath to type into. A crash is explained in words rather than left as a bare number.' },
   { sel: '#code-cases', inCode: true, side: 'top', k: 'Test cases',
     t: 'Many inputs at once', b: 'Save input and the answer you expect, then <b>Run tests</b> checks them all in one go — faster than pasting inputs one at a time.' },
   { sel: '#code-split', inCode: true, side: 'top', k: 'Layout',

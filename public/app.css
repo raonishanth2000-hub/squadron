@@ -2332,6 +2332,8 @@ body.has-cur #draw-canvas{cursor:none;}
   font-family:var(--f-mono);font-size:8.5px;letter-spacing:.09em;text-transform:uppercase;
   background:var(--azure-wash);color:var(--azure);vertical-align:middle;}
 
+.code-stdin-h{color:var(--text-3);font-size:11px;font-weight:400;}
+
 /* the console line for an interactive run */
 .code-live-row{flex:none;display:flex;align-items:center;gap:8px;margin-top:8px;padding:8px 10px;
   border:1px solid var(--gold-dim);border-radius:var(--r-sm);background:var(--ink);}
@@ -2339,7 +2341,6 @@ body.has-cur #draw-canvas{cursor:none;}
 .code-live-in{flex:1;min-width:0;background:transparent;border:0;outline:none;color:var(--text);
   font-size:13px;font-family:var(--f-mono);}
 .code-live-in::placeholder{color:var(--text-3);}
-#code-live[aria-pressed="true"]{background:var(--gold-wash);border-color:var(--gold);color:var(--gold);}
 
 /* the input box, when a run just died for want of it */
 .code-stdin.want-input > summary{color:var(--gold);}

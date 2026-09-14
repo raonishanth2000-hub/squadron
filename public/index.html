@@ -855,15 +855,13 @@
           <svg class="icon icon-sm" aria-hidden="true"><use href="#i-play"/></svg>Run</button>
         <button class="btn btn-ghost btn-sm" id="code-test">
           <svg class="icon icon-sm" aria-hidden="true"><use href="#i-check"/></svg>Run tests<span id="code-test-n"></span></button>
-        <button class="btn btn-ghost btn-sm" id="code-live" aria-pressed="false"
-          title="Type input while the program runs, the way a terminal does">Interactive</button>
         <button class="btn btn-ghost btn-sm" id="code-copy">Copy code</button>
         <button class="btn btn-ghost btn-sm" id="code-share">Share…</button>
         <button class="btn btn-ghost btn-sm" id="code-lib" hidden>Library…</button>
         <button class="btn btn-ghost btn-sm" id="code-del" aria-label="Delete this file">Delete</button>
       </div>
 
-      <details class="code-stdin"><summary>Input (stdin)</summary>
+      <details class="code-stdin"><summary>Input (stdin) <span class="code-stdin-h">— leave empty to type as it runs</span></summary>
         <textarea id="code-in" rows="3" spellcheck="false" placeholder="Typed here, fed to the program"
           aria-label="Standard input"></textarea></details>
 
